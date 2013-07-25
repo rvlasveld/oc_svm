@@ -23,24 +23,25 @@ function [ output_args ] = apply_inc_svdd( data, columns )
     set(gca, 'XTick', 0:50:length(data));
     
     % SVDD Parameters
-    C       = 1;
+    C       = 0.1;
     ktype   = 'r';          % RBF
     kpar    = 4;            % Sigma
 %     x       = +a;           % Examples
 %     y       = getoclab(a);  % Label of examples
 %     y = ones(step_size, 1);
     
+    first_block_size = max(1/C, step_size);
     
     % Create the SVDD
-    W = inc_setup('svdd', ktype, kpar, C, data(1:step_size,columns), ones(step_size, 1) );
+    W = inc_setup('svdd', ktype, kpar, C, data(1:first_block_size,columns), ones(first_block_size, 1) );
 %     w0 = inc_store(W);
 %     w = +w0;
     
     
 
-    from = step_size;
+    from = first_block_size;
     
-    for i = 2 * step_size: step_size : length(data)
+    for i = first_block_size + step_size: step_size : length(data)
         
         % Extract new point from data buffer
         new_points = data(i-step_size + 1 : i, columns);
