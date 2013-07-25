@@ -9,7 +9,7 @@
 % Currently, the properties of the line can not be set. The color is set to
 % black.
 
-function handles = draw_verical_lines( positions )
+function handles = draw_vertical_lines( positions )
 
     yL = get(gca, 'YLim');
     handles = zeros(length(positions),1);
