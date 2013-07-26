@@ -1,4 +1,4 @@
-function apply_inc_svdd( data, columns )
+function offs = apply_inc_svdd( data, columns )
 %APPLY_INC_SVDD Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -30,6 +30,10 @@ function apply_inc_svdd( data, columns )
     
     set(gca, 'XTick', 0:50:length(data));
     
+    
+%     offs = zeros(ceil(length(data)/step_size),2);
+    offs = [];
+    
     % SVDD Parameters
     C       = 0.1;
     ktype   = 'r';          % RBF
@@ -48,7 +52,7 @@ function apply_inc_svdd( data, columns )
     
 
     from = first_block_size;
-    
+    counter = 1;
     for i = first_block_size + step_size: step_size : length(data)
         
         % Extract new point from data buffer
@@ -84,6 +88,8 @@ function apply_inc_svdd( data, columns )
         w = +w0;
 %         fprintf( 'Block from %i to %i (new_points from %i); offs: %f \n', from - step_size + 1, i, i-step_size + 1, w.offs );
         
+        offs(end+1,:) = [i, w.offs];
+
         % Draw mapping and points
         [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, from:i, columns, w0, w, i-step_size:i);
 %         
@@ -127,6 +133,8 @@ function apply_inc_svdd( data, columns )
         drawnow;
 %         sfigure(1);
 %         pause(0.01);
+
+        counter = counter + 1;
     end
    
 end
