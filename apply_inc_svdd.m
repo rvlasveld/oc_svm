@@ -1,4 +1,4 @@
-function [ output_args ] = apply_inc_svdd( data, columns )
+function apply_inc_svdd( data, columns )
 %APPLY_INC_SVDD Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -11,15 +11,23 @@ function [ output_args ] = apply_inc_svdd( data, columns )
     step_size = 5;
     
     
-    figure(3); clf; axis auto;
+    sfigure(3); clf; axis auto;
     
     plot(1:length(data), data(:,:));
     set(gca, 'XTick', 0:50:length(data));
     
     h_verticals = draw_vertical_lines([0 0]);
+    xLimits_full_plot = get(gca, 'XLim');
     
-    figure(1); clf; axis auto;
-    figure(2); clf; axis auto;
+    sfigure(1); clf; axis auto;
+    
+    
+    sfigure(2); cla;
+    hold on;
+    % Force axis to equal figure 3
+    xlim(xLimits_full_plot);
+    ylim([0 1]);
+    
     set(gca, 'XTick', 0:50:length(data));
     
     % SVDD Parameters
@@ -74,30 +82,62 @@ function [ output_args ] = apply_inc_svdd( data, columns )
         % Get mapping representations
         w0 = inc_store(W);
         w = +w0;
-        fprintf( 'Block from %i to %i (new_points from %i); offs: %f \n', from - step_size + 1, i, i-step_size + 1, w.offs );
+%         fprintf( 'Block from %i to %i (new_points from %i); offs: %f \n', from - step_size + 1, i, i-step_size + 1, w.offs );
         
         % Draw mapping and points
         [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, from:i, columns, w0, w, i-step_size:i);
+%         
+%         
+%         [LEGH,OBJH,OUTH,OUTM] = legend;
+%         
+%         if ~ISEMPTY
+%             texts = [['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') ']];
+%             
+%             if ~isnan(w.offs)
+%                 texts(end+1) = 'Boundary'
+%                 
+%             end
+%         end
+%         
+%         [LEGH, OBJH, OUTH, OUTM] = legend(h_data(1), ['Data (' int2str(i-from+1+step_size) ') ']);
+%         [LEGH, OBJH, OUTH, OUTM] = legend([OUTH; h_SVs(1)], OUTM{:}, ['Support Vectors (' int2str(length(w.sv)) ') ']);
+%         [LEGH, OBJH, OUTH, OUTM] = legend([OUTH; h_new_points(1)], OUTM{:}, ['New Point (' int2str(i) ') ']);
+%         
+%         if ~isnan(w.offs)
+%             [LEGH, OBJH, OUTH, OUTM] = legend([OUTH; h_boundary(1)], OUTM{:}, 'Boundary');
+%         end
+
+
+        handles = [h_data(1), h_SVs(1), h_new_points(1)];
+        texts = {['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') ']};
         
-        legend([h_data(1) h_SVs(1) h_new_points(1) h_boundary(1)]', ['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') '], 'Boundary');
+        if ~isnan(w.offs)
+            handles(end+1) = h_boundary(1);
+            texts{end+1} = 'Boundary';
+        end
+        legend(handles', texts);
+
+        drawnow;
         
-        figure(3);
+        
+        sfigure(3);
         yL = get(gca, 'YLim');
         set(h_verticals(1), 'XData', [from-step_size from-step_size], 'YData', yL );
         set(h_verticals(2), 'XData', [i i], 'YData', yL );
-%         figure(1);
+        drawnow;
+%         sfigure(1);
 %         pause(0.01);
     end
-    
-
-    
+   
 end
 
 
 
 function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, rows, columns, w, W, indices_new)
 %     W = +w;
-    figure(1); clf;     axis auto;
+    persistent offsets;
+    
+    sfigure(1); cla;     axis auto;
     
     
     h_data          = scatterd(data(rows, columns), 'k*');      % Only draw first two features
@@ -113,11 +153,14 @@ function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data
     axis auto;
     hold on;
 
+    offsets(end+1,:) = [indices_new(end) W.offs]; 
     
-    figure(2);
+    sfigure(2);
+    cla;
     hold on;
-    scatter(indices_new(end), W.offs, 'b.');
-    axis auto;
-    hold on;
+    plot(offsets(:,1), offsets(:,2), 'b', 'LineWidth', 1.5 );
+%     scatter(indices_new(end), W.offs, 'b.');
+%     axis auto;
+    drawnow;
     
 end

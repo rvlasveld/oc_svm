@@ -1,0 +1,8 @@
+data2 = unique(data(200:length(data), [2 3]), 'rows', 'stable');
+
+block_size = 40;
+step_size = 5;
+
+C       = 0.1;
+ktype   = 'r';
+kpar    = 4;
