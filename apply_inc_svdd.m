@@ -21,7 +21,6 @@ function offs = apply_inc_svdd( data, columns )
     
     sfigure(1); clf; axis auto;
     
-    
     sfigure(2); cla;
     hold on;
     % Force axis to equal figure 3
