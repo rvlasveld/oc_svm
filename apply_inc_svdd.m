@@ -90,7 +90,7 @@ function offs = apply_inc_svdd( data, columns )
         offs(end+1,:) = [i, w.offs];
 
         % Draw mapping and points
-        [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, from:i, columns, w0, w, i-step_size:i);
+        [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, from:i, columns, w0, w, i-step_size:i, counter == 1);
 %         
 %         
 %         [LEGH,OBJH,OUTH,OUTM] = legend;
@@ -140,9 +140,13 @@ end
 
 
 
-function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, rows, columns, w, W, indices_new)
+function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, rows, columns, w, W, indices_new, clear_persistance)
 %     W = +w;
     persistent offsets;
+    
+    if clear_persistance
+        offsets = [];
+    end
     
     sfigure(1); cla;     axis auto;
     

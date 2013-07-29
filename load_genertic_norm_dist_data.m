@@ -1,9 +1,23 @@
-function [ alphas, change_points ] = load_genertic_norm_dist_data(size,function_type)
-% PROVIDE_DATA_BATCH Provide data in a offline manner of -size- elements
-%   Detailed explanation goes here
+function [ data, change_points ] = load_genertic_norm_dist_data(size,type)
+% LOAD_GENERIC_NORM_DIST_DATA Generate data following normal distributions
+%
+%   The SIZE indicates the length of the requested data sequence (default
+%   100)
+%
+%   The TYPE sets the type of segments/distributions. The options are:
+%   - 'alternating: (default) generate with alternating variances of 5 and
+%   1, mean 0
+%   - 'paper': Use the patern of the paper (which paper?). Mean 0 and
+%   variances in segment [1   : 391]: 1, [391 : 518]: 0.365 and [518 : 700]
+%   : 1.033
+%   - 'homogeneous': single segment with mean 0 and variance 1.
+%   - 'single': two segments with mean 0 and variances 1 and 2
+%
+%   The vector CHANGE_POINTS containts the data times at which the pattern
+%   changed
 
     if nargin < 2
-        function_type = 'alternating';
+        type = 'alternating';
         
         if nargin < 1
             size = 100;            
@@ -12,18 +26,20 @@ function [ alphas, change_points ] = load_genertic_norm_dist_data(size,function_
     
     
     % Determine which generation function to use
-    switch function_type
+    switch type
         case 'alternating'
-            [alphas, change_points] = AlternatingVariance(size, 5, [1, 5, 1, 5, 1]);
+            [data, change_points] = AlternatingVariance(size, 5, [1, 5, 1, 5, 1]);
         case 'paper'
-            [alphas, change_points] = PaperExample();
+            [data, change_points] = PaperExample();
         case 'homogeneous'
-            [alphas, change_points] = AlternatingVariance(size, 1, 1);
+            [data, change_points] = AlternatingVariance(size, 1, 1);
         case 'single'
-            [alphas, change_points] = AlternatingVariance(size, 2, [1, 2]);
+            [data, change_points] = AlternatingVariance(size, 2, [1, 2]);
         otherwise
             warning('Unexpected function type.');
     end
+    
+    change_points(1) = [];
 
 end
 
@@ -70,7 +86,7 @@ function [values, change_points] = PaperExample()
     fprintf('  [391 : 518]: 0.365 \n');
     fprintf('  [518 : 700]: 1.033 \n');
     
-    change_points = [391 518 700];
+    change_points = [1, 391 518 700];
     
     values = zeros(1,700);
     for i=1:391

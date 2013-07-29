@@ -1,9 +1,10 @@
 function [datapoints, change_points] = load_camci_data( data_length, segment_size, change_type )
-% PAPER_DATASET Get the datasets as defined in the paper (by Camci?). Default length is
-% 1000
-%   Change_type can be {1,2,3}. The first has only change in mean, the
-%   second has change in mean and variance and the last has only a change
-%   in variance.
+% LOAD_CAMCI_DATA Get the datasets as defined in the paper (by Camci). 
+%   Default DATA_LENGTH is 1000.
+%   Default SEGMENT_SIZE is 100.
+%   CHANGE_TYPE can be {1 (default),2,3}. The first has only change in mean
+%   , the second has change in mean and variance and the last has only a 
+%   change in variance.
 
     if nargin < 1
         data_length = 1000;
