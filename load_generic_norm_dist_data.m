@@ -1,5 +1,6 @@
-function [ data, change_points ] = load_genertic_norm_dist_data(size,type)
 % LOAD_GENERIC_NORM_DIST_DATA Generate data following normal distributions
+%
+%       [DATA, CP] = LOAD_GENERIC_NORM_DIST_DATA(SIZE, TYPE)
 %
 %   The SIZE indicates the length of the requested data sequence (default
 %   100)
@@ -7,14 +8,16 @@ function [ data, change_points ] = load_genertic_norm_dist_data(size,type)
 %   The TYPE sets the type of segments/distributions. The options are:
 %   - 'alternating: (default) generate with alternating variances of 5 and
 %   1, mean 0
-%   - 'paper': Use the patern of the paper (which paper?). Mean 0 and
-%   variances in segment [1   : 391]: 1, [391 : 518]: 0.365 and [518 : 700]
-%   : 1.033
+%   - 'paper': Use the patern of the paper on CUSUM by Inclan and Tiao.
+%   Mean 0 and variances in segment [1 : 391] -> 1, [391 : 518] -> 0.365
+%   and [518 : 700] -> 1.033
 %   - 'homogeneous': single segment with mean 0 and variance 1.
 %   - 'single': two segments with mean 0 and variances 1 and 2
 %
 %   The vector CHANGE_POINTS containts the data times at which the pattern
 %   changed
+
+function [ data, change_points ] = load_generic_norm_dist_data(size,type)
 
     if nargin < 2
         type = 'alternating';
