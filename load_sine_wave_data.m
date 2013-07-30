@@ -14,21 +14,10 @@
 
 function [ datapoints, change_points ] = load_sine_wave_data( data_length, amplitudes, frequencies, snrs )
 
-    if nargin < 1
-        data_length = 10;
-    end
-    
-    if nargin < 2
-        amplitudes = [1 3 1 5 2];
-    end
-    
-    if nargin < 3
-        frequencies = ones(length(amplitudes), 1) * 10;
-    end
-    
-    if nargin < 4
-        snrs = zeros(length(amplitudes), 1 );
-    end
+    if nargin < 1; data_length = 10; end
+    if nargin < 2; amplitudes = [1 3 1 5 2]; end
+    if nargin < 3; frequencies = ones(length(amplitudes), 1) * 10; end
+    if nargin < 4; snrs = zeros(length(amplitudes), 1 ); end
     
     if ~isequal(length(amplitudes), length(frequencies), length(snrs) )
         error ('All input arguments must be of the same length');
