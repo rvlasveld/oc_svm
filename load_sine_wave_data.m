@@ -54,9 +54,11 @@ function [ datapoints, change_points ] = load_sine_wave_data( data_length, ampli
         
         
         datapoints(i:i+length(y)-1) = y;
-        change_points(segment) = ((segment - 1) * per_segment) + 1;
+        change_points(segment) = i;
         i = i + length(y);
     end
+    
+    change_points(1) = [];
 
 end
 
