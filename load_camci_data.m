@@ -30,8 +30,6 @@ function [datapoints, change_points] = load_camci_data( data_length, segment_siz
         else
             x(i) = 0.6*x(i-1) - 0.5*x(i-2) + new_value;
         end
-        
-        fprintf( '=== Value for %i : %f, mean: %f, variance: %f === \n\n', i, x(i), mean, variance);
     end
     
     datapoints = x;
@@ -42,8 +40,6 @@ function [mean, variance] = mean_and_var(i, data_length, segment_size, type, mea
     
     if mod(i, segment_size) == 0
         y = i / segment_size;
-        
-        fprintf( '\n \n \n Switching for i: %i , y: %f \n', i, y );
         
         switch type
             case 1
@@ -62,18 +58,12 @@ function [mean, variance] = mean_and_var(i, data_length, segment_size, type, mea
                 end
                 
         end
-        
-        fprintf( 'Mean: %f, variance: %f \n', mean, variance );
     end
     
     if type == 2
         
         % Change in mean and variance. Mean already done in switch block
         variance = 0.1/(0.01 + (data_length - i)/data_length);
-        fprintf( 'Variance: %f \n', variance );
     end
-    
-    fprintf( 'Mean: %f \n', mean );
-    
 end
 
