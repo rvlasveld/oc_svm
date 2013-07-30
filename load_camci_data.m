@@ -15,7 +15,7 @@ function [datapoints, change_points] = load_camci_data( data_length, segment_siz
     if nargin < 3; change_type  = 1; end
     
 
-    x = [0 0];
+    x = [0; 0];
     
     mean = 0;
     variance = 1;
