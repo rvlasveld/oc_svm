@@ -137,6 +137,14 @@ function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data
     
     if clear_persistance; offsets = []; thresholds = []; end
     
+    
+    % Check which (new) data points are outliers
+    new_data = data(rows, columns)
+    new_data_mapped = +(new_data * w)
+    threshold = W.threshold
+    indices_outliers = abs(new_data_mapped(:,1)) - 0.0001 > (threshold)
+    
+    
     % Select the window with mapped data and boundary
     sfigure(1); cla; axis auto;
     
@@ -146,6 +154,15 @@ function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data
     axis auto; hold on;
     h_new_points    = scatterd(data(indices_new, columns), 'g*');
     axis auto; hold on;
+    
+    if length(find(indices_outliers > 0 ))
+        h_outliers      = scatterd(new_data(indices_outliers, columns), 'ko');
+        axis auto; hold on;
+        
+        % TODO: plot the total distance from the outliers to the
+        % hypersphere, using the `new_mapped_data` and `threshold` values.
+    end
+    
     h_boundary      = plotc(w, 'b');
     axis auto; hold on;
 
