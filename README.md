@@ -1,4 +1,4 @@
-# TEMPORAL SEGMENTATION USING ONE-CLASS SUPPORT VECTOR MACHINES
+# Temporal segmentation using one-class support vector machines
 
 This Matlab project is used as an experimental setup for the master thesis of Roemer Vlasveld.
 
