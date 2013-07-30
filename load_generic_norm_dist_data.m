@@ -1,5 +1,6 @@
-function [ data, change_points ] = load_genertic_norm_dist_data(size,type)
 % LOAD_GENERIC_NORM_DIST_DATA Generate data following normal distributions
+%
+%       [DATA, CP] = LOAD_GENERIC_NORM_DIST_DATA(SIZE, TYPE)
 %
 %   The SIZE indicates the length of the requested data sequence (default
 %   100)
@@ -15,6 +16,8 @@ function [ data, change_points ] = load_genertic_norm_dist_data(size,type)
 %
 %   The vector CHANGE_POINTS containts the data times at which the pattern
 %   changed
+
+function [ data, change_points ] = load_generic_norm_dist_data(size,type)
 
     if nargin < 2
         type = 'alternating';
