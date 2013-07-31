@@ -1,0 +1,4 @@
+####
+data = [load_camci_data(5000,400,1) load_camci_data(5000,400,1)];
+apply_inc_svdd(data, [1 2], 100, 10, 0.1, 'r', 8 )
+####

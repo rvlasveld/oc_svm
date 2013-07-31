@@ -23,7 +23,7 @@
 
 
 
-function offs = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
+function [offs, w] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
 
 
     if size(data, 2) == 1
@@ -43,52 +43,57 @@ function offs = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, 
     if nargin < 7; kpar = 4; end        % Sigma
     
     % Make sure data is unique (otherwise problems with inc_remove)
-    data = unique(data, 'rows', 'stable');
+    data = unique(data(:, columns), 'rows', 'stable');
     
     
-    first_block_size = max(1/C, step_size);
-    offs = zeros(ceil(length(data)/step_size) - (first_block_size + step_size),2);
+%     first_block_size = floor(max(1/C, step_size))
+    first_block_size = block_size;
+    offs = zeros(ceil(size(data, 1)/step_size) - (first_block_size + step_size),2);
 
-    % Set up the figure, axis properties, handles for vertical line drawing
+    % Set up the figure with model representation, axis properties, handles for vertical line drawing
     sfigure(1); clf; axis auto;
     
-    %
+    % Figure with orignal data
     sfigure(3); clf; axis auto;
-    plot(1:length(data), data(:,:));
-    set(gca, 'XTick', 0:50:length(data));
+    plot(1:size(data, 1), data(:,:));
+    set(gca, 'XTick', 0:50:size(data, 1));
     
     h_verticals = draw_vertical_lines([0 0]);
     xLimits_full_plot = get(gca, 'XLim');
     
-    %
+    % Figure with threshold/offs values (model metrics)
     sfigure(2); cla; hold on;
     xlim(xLimits_full_plot);
     ylim([0 1]);
-    set(gca, 'XTick', 0:50:length(data));
+    set(gca, 'XTick', 0:50:size(data, 1));
     
     
-    
+    % Figure with outlier-metrics
+    sfigure(4); clf; axis auto;
+    xlim(xLimits_full_plot);
+    ylim([0 1]);
+    set(gca, 'XTick', 0:50:size(data, 1));
    
     
     % Create the SVDD
-    W = inc_setup('svdd', ktype, kpar, C, data(1:first_block_size,columns), ones(first_block_size, 1) );
+    W = inc_setup('svdd', ktype, kpar, C, data(1:first_block_size,:), ones(first_block_size, 1) );
 
-    from = first_block_size;
+    from = 1;
     counter = 1;
-    for i = first_block_size + step_size: step_size : length(data)
-        
+    for i = first_block_size + step_size: step_size : size(data, 1)
+        i
         % Extract new point from data buffer
-        new_points = data(i-step_size + 1 : i, columns);
+        new_points = data(i-step_size + 1 : i, :);
         
         % Add to SVDD
-        for j = 1 : length(new_points)
+        for j = 1 : size(new_points, 1)
             W = inc_add(W, new_points(j,:), 1);
         end
         
         % Remove first point from SVDD
         if i >= (from + block_size)
             
-            for j = 1 : length(new_points)
+            for j = 1 : size(new_points, 1)
                 W = inc_remove(W,1);
             end
             from = from + step_size;
@@ -102,14 +107,19 @@ function offs = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, 
         offs(counter,:) = [i, w.offs];
 
         % Draw mapping and points
-        [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, from:i, columns, w0, w, i-step_size:i, counter == 1);
+        [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = draw_data_and_boundary(data, from:i, w0, w, i-step_size+1:i, counter == 1);
 
         handles = [h_data(1), h_SVs(1), h_new_points(1)];
-        texts = {['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') '] ''};
+        texts = {['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') ']};
+        
+        if numel(h_outliers) ~= 0
+            handles(end+1) = h_outliers(1);
+            texts{end+1} = ['Outliers (' int2str(num_outliers) ')'];
+        end
         
         if numel(h_boundary) ~= 0
-            handles(4) = h_boundary(1);
-            texts{4} = 'Boundary';
+            handles(end+1) = h_boundary(1);
+            texts{end+1} = 'Boundary';
         end
         legend(handles', texts);
         
@@ -126,55 +136,83 @@ function offs = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, 
 
         counter = counter + 1;
     end
+    
+    sfigure(2);
+    legend('W.offs', 'W.threshold');
+    drawnow;
+    sfigure(4);
+    legend('Total outlier distances', 'Number of outliers');
+    drawnow;
    
 end
 
 
 
-function [h_data, h_SVs, h_new_points, h_boundary] = draw_data_and_boundary(data, rows, columns, w, W, indices_new, clear_persistance)
+function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = draw_data_and_boundary(data, rows, w, W, indices_new, clear_persistance)
     persistent offsets
     persistent thresholds;
+    persistent outlier_distances;
+    persistent number_of_outliers;
     
-    if clear_persistance; offsets = []; thresholds = []; end
+    if clear_persistance; offsets = []; thresholds = []; outlier_distances = []; number_of_outliers = []; end
     
+    length(W.sv)
+    data(rows, :)
+    [W.sv W.alf];
+    
+    sfigure(2);
+    cla; hold on; ylim('auto');
     
     % Check which (new) data points are outliers
-    new_data = data(rows, columns)
-    new_data_mapped = +(new_data * w)
-    threshold = W.threshold
-    indices_outliers = abs(new_data_mapped(:,1)) - 0.0001 > (threshold)
+    new_data = data(rows,:);
+    new_data_mapped = +(new_data * w);
+    threshold = W.threshold;
+    indices_outliers = abs(new_data_mapped(:,1)) - 0.0001 > (threshold);
     
     
     % Select the window with mapped data and boundary
     sfigure(1); cla; axis auto;
     
-    h_data          = scatterd(data(rows, columns), 'k*');      % Only draw first two features
+    h_data          = scatterd(data(rows,:), 'k*');      % Only draw first two features
     axis auto; hold on;
     h_SVs           = scatterd(W.sv, 'r*');                     % Points acting as Support Vector
     axis auto; hold on;
-    h_new_points    = scatterd(data(indices_new, columns), 'g*');
+    h_new_points    = scatterd(data(indices_new,:), 'g*');
     axis auto; hold on;
-    
-    if length(find(indices_outliers > 0 ))
-        h_outliers      = scatterd(new_data(indices_outliers, columns), 'ko');
-        axis auto; hold on;
-        
-        % TODO: plot the total distance from the outliers to the
-        % hypersphere, using the `new_mapped_data` and `threshold` values.
-    end
-    
     h_boundary      = plotc(w, 'b');
     axis auto; hold on;
+    
+    h_outliers = 0;
+    num_outliers = length(find(indices_outliers));
+    number_of_outliers(end+1, :) = [indices_new(end) num_outliers];
+    if num_outliers
+%         fprintf( 'Number of outliers: %i for indices_new: %i \n', length(find(indices_outliers)), indices_new(end));
+        h_outliers      = scatterd(new_data(indices_outliers, :), 'ko');
+        axis auto; hold on;
+        
+        outlier_distances(end+1,:) = [indices_new(end) sum(abs(new_data_mapped(indices_outliers, 1)))];
+    else
+        outlier_distances(end+1,:) = [indices_new(end) 0];
+    end
+    
 
     offsets(end+1,:) = [indices_new(end) W.offs]; 
     thresholds(end+1,:) = [indices_new(end) W.threshold]; 
     
     % Draw the offs in the window
     sfigure(2);
-    cla;
-    hold on;
-    plot(offsets(:,1), offsets(:,2), 'b', 'LineWidth', 1.5 );
-    plot(thresholds(:,1), thresholds(:,2), 'g', 'LineWidth', 1.5 );
+%     cla;
+%     hold on;
+    
+    plot(offsets(:,1), offsets(:,2), 'b', 'LineWidth', 1 );
+    plot(thresholds(:,1), thresholds(:,2), 'g', 'LineWidth', 1 );
+    
+    ylim('auto');
     drawnow;
     
+    sfigure(4); cla; hold on;
+    plot(outlier_distances(:,1), outlier_distances(:,2), 'r', 'LineWidth', 1 );
+    plot(number_of_outliers(:,1), number_of_outliers(:,2), 'b', 'LineWidth', 1 );
+    ylim('auto');
+    drawnow;
 end
