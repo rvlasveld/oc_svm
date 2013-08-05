@@ -19,11 +19,18 @@
 %   The returned value OFFS gives for each window the approximated (?)
 %   radius of the hypersphere.
 %
+%   Output values:
+%       - OFFS: for each window the approximated (?) radius of the
+%       hypersphere
+%       - W: the final model representation
+%       - AI: the indices after applying `unique` on the data. This can be
+%       used to recalculate the change_points locations (if known).
+%
 %   See also inc_setup, incsvdd, inc_add, inc_remove.
 
 
 
-function [offs, w] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
+function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
 
 
     if size(data, 2) == 1
@@ -43,7 +50,7 @@ function [offs, w] = apply_inc_svdd( data, columns, block_size, step_size, C, kt
     if nargin < 7; kpar = 4; end        % Sigma
     
     % Make sure data is unique (otherwise problems with inc_remove)
-    data = unique(data(:, columns), 'rows', 'stable');
+    [data, ai, ~] = unique(data(:, columns), 'rows', 'stable');
     
     
 %     first_block_size = floor(max(1/C, step_size))
@@ -81,7 +88,7 @@ function [offs, w] = apply_inc_svdd( data, columns, block_size, step_size, C, kt
     from = 1;
     counter = 1;
     for i = first_block_size + step_size: step_size : size(data, 1)
-        i
+%         i
         % Extract new point from data buffer
         new_points = data(i-step_size + 1 : i, :);
         
@@ -156,8 +163,8 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = d
     
     if clear_persistance; offsets = []; thresholds = []; outlier_distances = []; number_of_outliers = []; end
     
-    length(W.sv)
-    data(rows, :)
+%     length(W.sv)
+%     data(rows, :)
     [W.sv W.alf];
     
     sfigure(2);
