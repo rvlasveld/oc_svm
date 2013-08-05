@@ -1,7 +1,7 @@
 %APPLY_INC_SVDD Apply the incremental SVDD algorithm over a data set
 %
-%       [OFFS] = APPLY_INC_SVDD( DATA, COLUMNS, BLOCK_SIZE, STEP_SIZE, C,
-%           KTYPE, KPAR )
+%       [OFFS, W, AI ] = APPLY_INC_SVDD( DATA, COLUMNS, BLOCK_SIZE,
+%           STEP_SIZE, C, KTYPE, KPAR )
 %   
 %   Apply the incremental SVDD algorithm and get the w.offs for each
 %   window, representing the radius of the hypersphere.

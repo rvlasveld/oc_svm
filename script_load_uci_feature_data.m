@@ -1,6 +1,6 @@
-subject = 5;
+subject = 25;
 activity = 0;        % set to 0 for all activities by subject.
-features = [1 2 3];  % Must be consecutive values
+features = [41 42 43];  % Must be consecutive values
 % columns = [1 2];
 limit_range = 10000;
 
@@ -93,5 +93,5 @@ set(ax(1), 'YLim', [floor(min(min(data(range,:))) * 100)/100 ceil(max(max(data(r
 set(ax(2), 'YLim', [1 6], 'YTick', 1:6, 'YTickLabel', labels );
 set(h2, 'LineWidth', 2);
 
-title( ['Subject ' int2str(subject) ', features ' int2str(features)] ); 
+title( ['Subject ' int2str(subject) ', features [' int2str(features) ']' ]); 
 
