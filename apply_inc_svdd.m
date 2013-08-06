@@ -30,7 +30,7 @@
 
 
 
-function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
+function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
 
 
     if size(data, 2) == 1
@@ -56,7 +56,9 @@ function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     
 %     first_block_size = floor(max(1/C, step_size))
     first_block_size = block_size;
-    offs = zeros(ceil(size(data, 1)/step_size) - (first_block_size + step_size),2);
+    results_length   = ceil(size(data, 1)/step_size) - (first_block_size + step_size);
+    results_zeros    = zeros(results_length, 2);
+    offs             = results_zeros;
 
     % Set up the figure with model representation, axis properties, handles for vertical line drawing
     sfigure(1); clf; axis auto;
@@ -77,7 +79,7 @@ function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     
     
     % Figure with outlier-metrics
-    sfigure(4); clf; axis auto;
+    sfigure(4); cla; axis auto;
     xlim(xLimits_full_plot);
     ylim([0 1]);
     set(gca, 'XTick', 0:50:size(data, 1));
@@ -88,6 +90,12 @@ function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
 
     from = 1;
     counter = 1;
+    
+    number_of_outliers  = results_zeros;
+    offsets             = results_zeros;
+    outlier_distances   = results_zeros;
+    thresholds          = results_zeros;
+    
     for i = first_block_size + step_size: step_size : size(data, 1)
 %         i
         % Extract new point from data buffer
@@ -115,14 +123,20 @@ function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
         offs(counter,:) = [i, w.offs];
 
         % Draw mapping and points
-        [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = draw_data_and_boundary(data, from:i, w0, w, i-step_size+1:i, counter == 1);
+        [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = calculate_data_and_boundary(data, from:i, w0, w, i-step_size+1:i, counter == 1);
+        
+        number_of_outliers(counter,:) = properties('number_of_outliers');
+        offsets(counter,:)            = properties('offsets');
+        outlier_distances(counter,:)  = properties('outlier_distances');
+        thresholds(counter,:)         = properties('thresholds');
 
         handles = [h_data(1), h_SVs(1), h_new_points(1)];
         texts = {['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') ']};
         
         if numel(h_outliers) ~= 0
             handles(end+1) = h_outliers(1);
-            texts{end+1} = ['Outliers (' int2str(num_outliers) ')'];
+            
+            texts{end+1} = ['Outliers (' int2str(number_of_outliers(counter,2)) ')'];
         end
         
         if numel(h_boundary) ~= 0
@@ -146,27 +160,38 @@ function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     end
     
     sfigure(2);
-    legend('W.offs', 'W.threshold');
+    legend('W.offs', 'W.threshold', 'ratio W.offs', 'ratio W.threshold');
     drawnow;
     sfigure(4);
-    legend('Total outlier distances', 'Number of outliers');
+    legend('Total outlier distances', 'Number of outliers', 'ratio outlier distance', 'ratio nubmer of outliers');
     drawnow;
-   
+    
+    results = containers.Map();
+    results('number_of_outliers') = number_of_outliers;
+    results('offsets')            = offsets;
+    results('outlier_distances')  = outlier_distances;
+    results('thresholds')         = thresholds;
 end
 
 
 
-function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = draw_data_and_boundary(data, rows, w, W, indices_new, clear_persistance)
+function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = calculate_data_and_boundary(data, rows, w, W, indices_new, clear_persistance)
     persistent offsets
     persistent thresholds;
     persistent outlier_distances;
     persistent number_of_outliers;
     
-    if clear_persistance; offsets = []; thresholds = []; outlier_distances = []; number_of_outliers = []; end
+    persistent offset_ratios;
+    persistent threshold_ratios;
+    persistent distance_ratios;
+    persistent outliers_ratios;
     
-%     length(W.sv)
-%     data(rows, :)
-    [W.sv W.alf];
+    if clear_persistance; 
+        offsets = []; thresholds = []; outlier_distances = []; number_of_outliers = []; 
+        offset_ratios = []; threshold_ratios = []; distance_ratios = []; outliers_ratios = [];
+    end
+    
+    i = indices_new(end);
     
     sfigure(2);
     cla; hold on; ylim('auto');
@@ -187,34 +212,49 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = d
     axis auto; hold on;
     h_new_points    = scatterd(data(indices_new,:), 'g*');
     axis auto; hold on;
-%     h_boundary      = plotc(w, 'b');
-%     axis auto; hold on;
+    
     h_boundary = 0;
+    if size(data, 2) < 3
+        h_boundary      = plotc(w, 'b');
+        axis auto; hold on;
+    end
     
     h_outliers = 0;
     num_outliers = length(find(indices_outliers));
-    number_of_outliers(end+1, :) = [indices_new(end) num_outliers];
+    number_of_outliers(end+1, :) = [i num_outliers];
     if num_outliers
-%         fprintf( 'Number of outliers: %i for indices_new: %i \n', length(find(indices_outliers)), indices_new(end));
+        
         h_outliers      = scatterd(new_data(indices_outliers, :), 'ko');
         axis auto; hold on;
         
-        outlier_distances(end+1,:) = [indices_new(end) sum(abs(new_data_mapped(indices_outliers, 1)))];
+        outlier_distances(end+1,:) = [i  sum(abs(new_data_mapped(indices_outliers, 1)))];
     else
-        outlier_distances(end+1,:) = [indices_new(end) 0];
+        outlier_distances(end+1,:) = [i 0];
     end
     
 
-    offsets(end+1,:) = [indices_new(end) W.offs]; 
-    thresholds(end+1,:) = [indices_new(end) W.threshold]; 
+    offsets(end+1,:) = [i W.offs]; 
+    thresholds(end+1,:) = [i W.threshold]; 
     
-    % Draw the offs in the window
+    % Draw the offs and threshold in the window
     sfigure(2);
-%     cla;
-%     hold on;
-    
+    hold on;
     plot(offsets(:,1), offsets(:,2), 'b', 'LineWidth', 1 );
     plot(thresholds(:,1), thresholds(:,2), 'g', 'LineWidth', 1 );
+    
+    % Draw the ratios
+    ratio_history = 10;
+    
+    ratio_offset = ratio(offsets(:,2), ratio_history);
+    offset_ratios(end+1,:) = [i ratio_offset];
+    
+    ratio_threshold = ratio(thresholds(:,2), ratio_history);
+    threshold_ratios(end+1,:) = [i ratio_threshold];
+    
+    plot(offset_ratios(:,1), offset_ratios(:,2), '--r', 'LineWidth', 1 );
+    plot(threshold_ratios(:,1), threshold_ratios(:,2), '--m', 'LineWidth', 1 );
+    
+    % TODO: USE plotyy FOR RATIOS ON ONE SIDE
     
     ylim('auto');
     drawnow;
@@ -222,6 +262,26 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = d
     sfigure(4); cla; hold on;
     plot(outlier_distances(:,1), outlier_distances(:,2), 'r', 'LineWidth', 1 );
     plot(number_of_outliers(:,1), number_of_outliers(:,2), 'b', 'LineWidth', 1 );
+    
+    % Draw the ratios
+    ratio_distances = ratio(outlier_distances(:,2), ratio_history);
+    distance_ratios(end+1,:) = [i ratio_distances];
+    
+    ratio_outliers = ratio(number_of_outliers(:,2), ratio_history);
+    outliers_ratios(end+1,:) = [i ratio_outliers];
+    
+    plot(distance_ratios(:,1), distance_ratios(:,2), '--g', 'LineWidth', 1.2 );
+    plot(outliers_ratios(:,1), outliers_ratios(:,2), '--m', 'LineWidth', 1.2 );
+    
     ylim('auto');
     drawnow;
+    
+    
+    properties = containers.Map();
+    properties('offsets') = offsets(end,:);
+    properties('thresholds') = thresholds(end,:);
+    properties('outlier_distances') = outlier_distances(end,:);
+    properties('number_of_outliers') = number_of_outliers(end,:);
+    
+    
 end

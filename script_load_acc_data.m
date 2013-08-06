@@ -22,14 +22,12 @@ rot = filtered{3};
 
 data = [acc mag(:,2:4) rot(:,2:4)];
 
+% data = accelerometer(:,2:5);     % Enable this to use a single data set
 
 % Normalize data (bring to range 0-1)
 for i = 2 : size(data, 2)
     data(:,i) = mat2gray(data(:,i));
 end
-
-
-% data = accelerometer(:,2:5);     % Enable this to use a single data set
 
 % indices_downstairs  = find(data(:,1) > 13 & data(:,1) < 23);
 % indices_upstairs    = find(data(:,1) > 34 & data(:,1) < 43);
@@ -45,5 +43,5 @@ for i = 1 : length(cp_seconds)
     change_points(i) = cp_indices(1);
 end
 
-[data_unique, ai, ~] = unique(data(:, [2 3]), 'rows', 'stable');
+[data_unique, ai, ~] = unique(data(:,2:end), 'rows', 'stable');
 change_points_shifted = replace_changepoints_after_unique(change_points, ai);
