@@ -38,7 +38,8 @@ function [offs, w, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
         data(:,2) = data(:,1);
     end
     
-    if nargin < 2; columns = [1 2]; end
+%     if nargin < 2; columns = [1 2]; end
+    if nargin < 2; columns = 1:size(data,2); end
     
     % Sliding window parameters
     if nargin < 3; block_size = 40; end
@@ -182,12 +183,13 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, num_outliers] = d
     
     h_data          = scatterd(data(rows,:), 'k*');      % Only draw first two features
     axis auto; hold on;
-    h_SVs           = scatterd(W.sv, 'r*');                     % Points acting as Support Vector
+    h_SVs           = scatterd(W.sv, size(data, 2), 'r*');                     % Points acting as Support Vector
     axis auto; hold on;
     h_new_points    = scatterd(data(indices_new,:), 'g*');
     axis auto; hold on;
-    h_boundary      = plotc(w, 'b');
-    axis auto; hold on;
+%     h_boundary      = plotc(w, 'b');
+%     axis auto; hold on;
+    h_boundary = 0;
     
     h_outliers = 0;
     num_outliers = length(find(indices_outliers));
