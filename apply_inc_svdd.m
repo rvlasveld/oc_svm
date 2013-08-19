@@ -64,7 +64,7 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     sfigure(1); clf; axis auto;
     
     % Figure with orignal data
-    sfigure(3); clf; axis auto;
+    sfigure(4); clf; axis auto;
     plot(1:size(data, 1), data(:,:));
     set(gca, 'XTick', 0:50:size(data, 1));
     
@@ -79,7 +79,7 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     
     
     % Figure with outlier-metrics
-    sfigure(4); cla; axis auto;
+    sfigure(3); cla; axis auto;
     xlim(xLimits_full_plot);
     ylim([0 1]);
     set(gca, 'XTick', 0:50:size(data, 1));
@@ -150,7 +150,7 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
         drawnow;
         
         % Draw the selection-bars in the data-plot window
-        sfigure(3);
+        sfigure(4);
         yL = get(gca, 'YLim');
         set(h_verticals(1), 'XData', [from-step_size from-step_size], 'YData', yL );
         set(h_verticals(2), 'XData', [i i], 'YData', yL );
@@ -162,7 +162,7 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     sfigure(2);
     legend('W.offs', 'W.threshold', 'ratio W.offs', 'ratio W.threshold');
     drawnow;
-    sfigure(4);
+    sfigure(3);
     legend('Total outlier distances', 'Number of outliers', 'ratio outlier distance', 'ratio nubmer of outliers');
     drawnow;
     
@@ -259,7 +259,7 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     ylim('auto');
     drawnow;
     
-    sfigure(4); cla; hold on;
+    sfigure(); cla; hold on;
     plot(outlier_distances(:,1), outlier_distances(:,2), 'r', 'LineWidth', 1 );
     plot(number_of_outliers(:,1), number_of_outliers(:,2), 'b', 'LineWidth', 1 );
     
@@ -270,8 +270,8 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     ratio_outliers = ratio(number_of_outliers(:,2), ratio_history);
     outliers_ratios(end+1,:) = [i ratio_outliers];
     
-    plot(distance_ratios(:,1), distance_ratios(:,2), '--g', 'LineWidth', 1.2 );
-    plot(outliers_ratios(:,1), outliers_ratios(:,2), '--m', 'LineWidth', 1.2 );
+    plot(distance_ratios(:,1), distance_ratios(:,2), '--g', 'LineWidth', 1 );
+    plot(outliers_ratios(:,1), outliers_ratios(:,2), '--m', 'LineWidth', 1 );
     
     ylim('auto');
     drawnow;
