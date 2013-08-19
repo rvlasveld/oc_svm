@@ -1,6 +1,6 @@
 %APPLY_INC_SVDD Apply the incremental SVDD algorithm over a data set
 %
-%       [OFFS, W, AI ] = APPLY_INC_SVDD( DATA, COLUMNS, BLOCK_SIZE,
+%       [PROPERTIES, RATIOS] = APPLY_INC_SVDD( DATA, COLUMNS, BLOCK_SIZE,
 %           STEP_SIZE, C, KTYPE, KPAR )
 %   
 %   Apply the incremental SVDD algorithm and get the w.offs for each
@@ -20,17 +20,18 @@
 %   radius of the hypersphere.
 %
 %   Output values:
-%       - OFFS: for each window the approximated (?) radius of the
-%       hypersphere
-%       - W: the final model representation
-%       - AI: the indices after applying `unique` on the data. This can be
-%       used to recalculate the change_points locations (if known).
+%       - PROPERTIES: The properties of the calculated SVM models. It is an
+%       container Map, with keys: {'thresholds', 'offsets',
+%       'outlier_distances', 'number_of_outliers'}.
+%       - RATIOS: The ratios of each value of PROPERTIES, calculated with
+%       the default history length of 10. This is a direct result of a call
+%       to draw_properties.
 %
-%   See also inc_setup, incsvdd, inc_add, inc_remove.
+%   See also inc_setup, incsvdd, inc_add, inc_remove, draw_properties.
 
 
 
-function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
+function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_size, C, ktype, kpar )
 
 
     if size(data, 2) == 1
@@ -38,7 +39,6 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
         data(:,2) = data(:,1);
     end
     
-%     if nargin < 2; columns = [1 2]; end
     if nargin < 2; columns = 1:size(data,2); end
     
     % Sliding window parameters
@@ -51,10 +51,8 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     if nargin < 7; kpar = 4; end        % Sigma
     
     % Make sure data is unique (otherwise problems with inc_remove)
-    [data, ai, ~] = unique(data(:, columns), 'rows', 'stable');
+    [data, ~, ~] = unique(data(:, columns), 'rows', 'stable');
     
-    
-%     first_block_size = floor(max(1/C, step_size))
     first_block_size = block_size;
     results_length   = ceil(size(data, 1)/step_size) - (first_block_size + step_size);
     results_zeros    = zeros(results_length, 2);
@@ -69,20 +67,11 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     set(gca, 'XTick', 0:50:size(data, 1));
     
     h_verticals = draw_vertical_lines([0 0]);
-    xLimits_full_plot = get(gca, 'XLim');
-    
-    % Figure with threshold/offs values (model metrics)
-    sfigure(2); cla; hold on;
-    xlim(xLimits_full_plot);
-    ylim([0 1]);
-    set(gca, 'XTick', 0:50:size(data, 1));
-    
-    
-    % Figure with outlier-metrics
-    sfigure(3); cla; axis auto;
-    xlim(xLimits_full_plot);
-    ylim([0 1]);
-    set(gca, 'XTick', 0:50:size(data, 1));
+
+    screenSize = get(0,'ScreenSize');
+    plot_width  = screenSize(3);
+    plot_height = screenSize(4) / 4;
+    sfigure(4); set(gcf,'Position',[0 (screenSize(4) - plot_height) plot_width plot_height]);
    
     
     % Create the SVDD
@@ -97,7 +86,6 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
     thresholds          = results_zeros;
     
     for i = first_block_size + step_size: step_size : size(data, 1)
-%         i
         % Extract new point from data buffer
         new_points = data(i-step_size + 1 : i, :);
         
@@ -129,7 +117,7 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
         offsets(counter,:)            = properties('offsets');
         outlier_distances(counter,:)  = properties('outlier_distances');
         thresholds(counter,:)         = properties('thresholds');
-
+        
         handles = [h_data(1), h_SVs(1), h_new_points(1)];
         texts = {['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') ']};
         
@@ -159,18 +147,19 @@ function [results, ai] = apply_inc_svdd( data, columns, block_size, step_size, C
         counter = counter + 1;
     end
     
-    sfigure(2);
-    legend('W.offs', 'W.threshold', 'ratio W.offs', 'ratio W.threshold');
-    drawnow;
-    sfigure(3);
-    legend('Total outlier distances', 'Number of outliers', 'ratio outlier distance', 'ratio nubmer of outliers');
-    drawnow;
-    
     results = containers.Map();
     results('number_of_outliers') = number_of_outliers;
     results('offsets')            = offsets;
     results('outlier_distances')  = outlier_distances;
     results('thresholds')         = thresholds;
+    
+    ratios = draw_properties(results, 10 );
+    
+    % Add empty y cols for equal space
+    sfigure(4);
+    addaxis([],[]);
+    addaxis([],[]);
+    addaxis([],[]);
 end
 
 
@@ -181,20 +170,11 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     persistent outlier_distances;
     persistent number_of_outliers;
     
-    persistent offset_ratios;
-    persistent threshold_ratios;
-    persistent distance_ratios;
-    persistent outliers_ratios;
-    
     if clear_persistance; 
         offsets = []; thresholds = []; outlier_distances = []; number_of_outliers = []; 
-        offset_ratios = []; threshold_ratios = []; distance_ratios = []; outliers_ratios = [];
     end
     
     i = indices_new(end);
-    
-    sfigure(2);
-    cla; hold on; ylim('auto');
     
     % Check which (new) data points are outliers
     new_data = data(rows,:);
@@ -206,10 +186,15 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     % Select the window with mapped data and boundary
     sfigure(1); cla; axis auto;
     
-    h_data          = scatterd(data(rows,:), 'k*');      % Only draw first two features
+    % Only draw first two features
+    h_data          = scatterd(data(rows,:), 'k*');      
     axis auto; hold on;
-    h_SVs           = scatterd(W.sv, size(data, 2), 'r*');                     % Points acting as Support Vector
+    
+    % Points acting as Support Vector
+    h_SVs           = scatterd(W.sv, size(data, 2), 'r*');
     axis auto; hold on;
+    
+    % Plot the points that are new in this incremental model
     h_new_points    = scatterd(data(indices_new,:), 'g*');
     axis auto; hold on;
     
@@ -235,47 +220,6 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
 
     offsets(end+1,:) = [i W.offs]; 
     thresholds(end+1,:) = [i W.threshold]; 
-    
-    % Draw the offs and threshold in the window
-    sfigure(2);
-    hold on;
-    plot(offsets(:,1), offsets(:,2), 'b', 'LineWidth', 1 );
-    plot(thresholds(:,1), thresholds(:,2), 'g', 'LineWidth', 1 );
-    
-    % Draw the ratios
-    ratio_history = 10;
-    
-    ratio_offset = ratio(offsets(:,2), ratio_history);
-    offset_ratios(end+1,:) = [i ratio_offset];
-    
-    ratio_threshold = ratio(thresholds(:,2), ratio_history);
-    threshold_ratios(end+1,:) = [i ratio_threshold];
-    
-    plot(offset_ratios(:,1), offset_ratios(:,2), '--r', 'LineWidth', 1 );
-    plot(threshold_ratios(:,1), threshold_ratios(:,2), '--m', 'LineWidth', 1 );
-    
-    % TODO: USE plotyy FOR RATIOS ON ONE SIDE
-    
-    ylim('auto');
-    drawnow;
-    
-    sfigure(); cla; hold on;
-    plot(outlier_distances(:,1), outlier_distances(:,2), 'r', 'LineWidth', 1 );
-    plot(number_of_outliers(:,1), number_of_outliers(:,2), 'b', 'LineWidth', 1 );
-    
-    % Draw the ratios
-    ratio_distances = ratio(outlier_distances(:,2), ratio_history);
-    distance_ratios(end+1,:) = [i ratio_distances];
-    
-    ratio_outliers = ratio(number_of_outliers(:,2), ratio_history);
-    outliers_ratios(end+1,:) = [i ratio_outliers];
-    
-    plot(distance_ratios(:,1), distance_ratios(:,2), '--g', 'LineWidth', 1 );
-    plot(outliers_ratios(:,1), outliers_ratios(:,2), '--m', 'LineWidth', 1 );
-    
-    ylim('auto');
-    drawnow;
-    
     
     properties = containers.Map();
     properties('offsets') = offsets(end,:);

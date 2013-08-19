@@ -46,7 +46,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     outlier_distances   = properties('outlier_distances');
     number_of_outliers  = properties('number_of_outliers');
     
-    data_length         = 1:size(thresholds,1);
+    data_x         = thresholds(:, 1);
     
     % Calculate all the ratios
     ratio_map = containers.Map();
@@ -56,9 +56,9 @@ function ratio_map = draw_properties( properties, ratio_history_length )
         
         key = property_keys(i);
         series = cell2mat(values(properties,key));
-        ratio_series = zeros(1, length(series));
+        ratio_series = zeros(1, size(series, 1));
         
-        for j = i : length(series)
+        for j = i : size(series, 1)
             ratio_series(j) = ratio(series(1:j,:), ratio_history_length); 
         end
         
@@ -74,23 +74,21 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     set(0,'DefaultAxesLooseInset',[0.03,0,0.05,0])
     
     % Set plot location and size
-    screenSize  = get(0,'ScreenSize');
+    screenSize = get(0,'ScreenSize');
     plot_width  = screenSize(3);
     plot_height = screenSize(4) / 4;
-    sfigure(2); set(gcf,'Position',[0 0 plot_width plot_height]);
-    sfigure(3); set(gcf,'Position',[0 plot_height plot_width plot_height]);
-    
     
     % Offsets and Thresholds raw values
     sfigure(2); clf;
+    set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
     
     ratio_offsets    = ratio_map('offsets');
     ratio_thresholds = ratio_map('thresholds');
     
-    plot(data_length, offsets(:,2), 'k-' );
-    addaxis(data_length, thresholds(:,2), 'r-' );
-    addaxis(data_length, ratio_offsets(:,2), 'm--' );
-    addaxis(data_length, ratio_thresholds(:,2), 'b--' );
+    plot(data_x, offsets(:,2), 'k-' );
+    addaxis(data_x, thresholds(:,2), 'r-' );
+    addaxis(data_x, ratio_offsets(:,2), 'm--' );
+    addaxis(data_x, ratio_thresholds(:,2), 'b--' );
     
     addaxislabel(1, 'Offsets');
     addaxislabel(2, 'Thresholds');
@@ -99,16 +97,19 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     
     legend('Offsets', 'Thresholds', 'Ratio offsets', 'Ratio thresholds');
     
+    set(gca, 'XTick', 0:50:data_x(end, 1));
+    
     % Outlier distances and number
     sfigure(3); clf;
+    set(gcf,'Position',[0 0 plot_width plot_height]);
     
     ratio_distances = ratio_map('outlier_distances');
     ratio_number    = ratio_map('number_of_outliers');
     
-    plot(data_length, outlier_distances(:,2), 'k-' );
-    addaxis(data_length, number_of_outliers(:,2), 'r-' );
-    addaxis(data_length, ratio_distances(:,2), 'm--' );
-    addaxis(data_length, ratio_number(:,2), 'b--' );
+    plot(data_x, outlier_distances(:,2), 'k-' );
+    addaxis(data_x, number_of_outliers(:,2), 'r-' );
+    addaxis(data_x, ratio_distances(:,2), 'm--' );
+    addaxis(data_x, ratio_number(:,2), 'b--' );
     
     addaxislabel(1, 'Outlier distances');
     addaxislabel(2, 'Number of outliers');
@@ -116,4 +117,6 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     addaxislabel(4, 'Ratio number');
     
     legend('Outlier distances', 'Number of outliers', 'Ratio distances', 'Ratio number');    
+    
+    set(gca, 'XTick', 0:50:data_x(end, 1));
 end
