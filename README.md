@@ -3,7 +3,7 @@
 This Matlab project is used as an experimental setup for the master thesis of Roemer Vlasveld.
 
 ## One-Class Support Vector Machines?
-I have written an [Introduction to One-Class Support Vector Machines](rvlasveld.github.io/blog/2013/07/12/introduction-to-one-class-support-vector-machines/) explaining the idea of One-Class SVM.
+I have written an [Introduction to One-Class Support Vector Machines](http://rvlasveld.github.io/blog/2013/07/12/introduction-to-one-class-support-vector-machines/) explaining the idea of One-Class SVM.
 That should be a good starting point to understand this material.
 
 ## How to use this
