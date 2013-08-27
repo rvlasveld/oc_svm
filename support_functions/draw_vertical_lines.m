@@ -7,8 +7,7 @@
 % a line will be drawn.
 % A COLOR string can be added for color settings etc.
 %
-% Currently, the properties of the line can not be set. The color is set to
-% black.
+% Currently, other properties of the line can not be set.
 
 function handles = draw_vertical_lines( positions, color )
 

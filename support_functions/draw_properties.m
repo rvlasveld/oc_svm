@@ -9,7 +9,7 @@
 %   used for the ratio calculation.
 % 
 %   The returned RATIO_MAP holds for each key the ratio for every time
-%   point.
+%pro   point.
 %
 %   EXPECTED KEYS: {'thresholds', 'offsets', 'outlier_distances',
 %   'number_of_outliers'}
@@ -79,7 +79,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     plot_height = screenSize(4) / 4;
     
     % Offsets and Thresholds raw values
-    sfigure(2); clf;
+    sfigure(2); clf; axis auto;
     set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
     
     ratio_offsets    = ratio_map('offsets');
@@ -100,7 +100,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     set(gca, 'XTick', 0:50:data_x(end, 1));
     
     % Outlier distances and number
-    sfigure(3); clf;
+    sfigure(3); clf; axis auto;
     set(gcf,'Position',[0 0 plot_width plot_height]);
     
     ratio_distances = ratio_map('outlier_distances');

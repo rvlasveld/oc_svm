@@ -199,7 +199,7 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     axis auto; hold on;
     
     h_boundary = 0;
-    if size(data, 2) < 3
+    if size(data, 2) == 2
         h_boundary      = plotc(w, 'b');
         axis auto; hold on;
     end

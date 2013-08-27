@@ -13,20 +13,20 @@
 
 accelerometer = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-2/accelerometer.csv');
 % lin_acceleration = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-1/lin_acceleration.csv');
-% magnetic = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-2/magnetic_field.csv');
-% rotation = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-2/rotation.csv');
-% gravity = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-1/gravity.csv');
+% magnetic = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/roemer-2/magnetic_field.csv');
+% rotation = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/roemer-2/rotation.csv');
+% gravity = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/roemer-1/gravity.csv');
 
 % accelerometer = gravity;
 
 % Combine all the data and filter out unique timestamp rows
 % matrices = {accelerometer(:,2:5), magnetic(:,2:5), rotation(:,2:5)};
 % filtered = filter_unique_rows(matrices, 1);
-% 
+
 % acc = filtered{1};
 % mag = filtered{2};
 % rot = filtered{3};
-% 
+
 % data = [acc mag(:,2:4) rot(:,2:4)];
 
 data = accelerometer(:,2:5);     % Enable this to use a single data set
@@ -44,13 +44,13 @@ data = accelerometer(:,2:5);     % Enable this to use a single data set
 % upstairs            = data(indices_upstairs, 1:4);
 
 % cp_seconds          = [7 13 22 27.5 29.5 34 43 48 49.5 55 63 68.5 70.5 76 85 90.5 92];
-cp_seconds          = [];
-change_points       = zeros(length(cp_seconds), 1);
-
-for i = 1 : length(cp_seconds)
-    cp_indices = find(data(:,1) > cp_seconds(i));
-    change_points(i) = cp_indices(1);
-end
-
-[data_unique, ai, ~] = unique(data(:,2:end), 'rows', 'stable');
-change_points_shifted = replace_changepoints_after_unique(change_points, ai);
+% cp_seconds          = [];
+% change_points       = zeros(length(cp_seconds), 1);
+% 
+% for i = 1 : length(cp_seconds)
+%     cp_indices = find(data(:,1) > cp_seconds(i));
+%     change_points(i) = cp_indices(1);
+% end
+% 
+% [data_unique, ai, ~] = unique(data(:,2:end), 'rows', 'stable');
+% change_points_shifted = replace_changepoints_after_unique(change_points, ai);
