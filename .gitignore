@@ -11,3 +11,5 @@
 
 # Compiled MEX binaries (all platforms)
 *.mex*
+
+data/*.mov

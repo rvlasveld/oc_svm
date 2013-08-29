@@ -86,13 +86,15 @@ function [change_points, ratios] = thresholding_multiple(properties, fields, hig
         r = ratio(series, 10);
         ratios(i,:) = [time r];
         
-        if r > high
-            change_points(end+1,:) = [i time];
-        end
+%         if r > high
+%             change_points(end+1,:) = [i time];
+%         end
         
-        if r < low
-            change_points(end+1,:) = [i time-block_size];
-        end;
+        % TODO: check block-compenstation for low values
+        
+%         if r < low
+%             change_points(end+1,:) = [i time-block_size];
+%         end;
         
     end
 
@@ -127,8 +129,10 @@ function [change_points, ratios] = thresholding_single(properties, field, high, 
             change_points(end+1,:) = [i time];
         end
         
+        % TODO: check block-compenstation for low values
+        
         if r < low
-            change_points(end+1,:) = [i time-block_size];
+            change_points(end+1,:) = [i time]; %-block_size];
         end;
         
     end
