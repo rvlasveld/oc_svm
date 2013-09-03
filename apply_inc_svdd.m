@@ -131,10 +131,10 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
             handles(end+1) = h_boundary(1);
             texts{end+1} = 'Boundary';
         end
-        legend(handles', texts);
+%         legend(handles', texts);
         
         % Draw the window with mapped data points and boudary
-        sfigure(1);
+%         sfigure(1);
         drawnow;
         
         % Draw the selection-bars in the data-plot window
@@ -153,7 +153,7 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
     results('outlier_distances')  = outlier_distances;
     results('thresholds')         = thresholds;
     
-    ratios = draw_properties(results, 10 );
+    ratios = draw_properties(results, 20 );
     
     % Add empty y cols for equal space
     sfigure(4);
@@ -182,35 +182,39 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     threshold = W.threshold;
     indices_outliers = abs(new_data_mapped(:,1)) - 0.0001 > (threshold);
     
+    h_data = 0;
+    h_SVs = 0;
+    h_new_points = 0;
+    
     
     % Select the window with mapped data and boundary
-    sfigure(1); cla; axis auto;
+%     sfigure(1); cla; axis auto;
     
     % Only draw first two features
-    h_data          = scatterd(data(rows,:), 'k*');      
-    axis auto; hold on;
+%     h_data          = scatterd(data(rows,:), 'k*');      
+%     axis auto; hold on;
     
     % Points acting as Support Vector
-    h_SVs           = scatterd(W.sv, size(data, 2), 'r*');
-    axis auto; hold on;
+%     h_SVs           = scatterd(W.sv, size(data, 2), 'r*');
+%     axis auto; hold on;
     
     % Plot the points that are new in this incremental model
-    h_new_points    = scatterd(data(indices_new,:), 'g*');
-    axis auto; hold on;
+%     h_new_points    = scatterd(data(indices_new,:), 'g*');
+%     axis auto; hold on;
     
     h_boundary = 0;
-    if size(data, 2) == 2
-        h_boundary      = plotc(w, 'b');
-        axis auto; hold on;
-    end
+%     if size(data, 2) == 2
+%         h_boundary      = plotc(w, 'b');
+%         axis auto; hold on;
+%     end
     
     h_outliers = 0;
     num_outliers = length(find(indices_outliers));
     number_of_outliers(end+1, :) = [i num_outliers];
     if num_outliers
         
-        h_outliers      = scatterd(new_data(indices_outliers, :), 'ko');
-        axis auto; hold on;
+%         h_outliers      = scatterd(new_data(indices_outliers, :), 'ko');
+%         axis auto; hold on;
         
         outlier_distances(end+1,:) = [i  sum(abs(new_data_mapped(indices_outliers, 1)))];
     else
