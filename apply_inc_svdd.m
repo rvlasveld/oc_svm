@@ -51,20 +51,23 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
     if nargin < 7; kpar = 4; end        % Sigma
     
     % Make sure data is unique (otherwise problems with inc_remove)
-    [data, ~, ~] = unique(data(:, columns), 'rows', 'stable');
+    [filtered_data, IA, ~] = unique(data(:,columns), 'rows', 'stable');
+    
+    % Include time as first column
+    data = [data(IA,1) filtered_data];
     
     first_block_size = block_size;
     results_length   = ceil(size(data, 1)/step_size) - (first_block_size + step_size);
-    results_zeros    = zeros(results_length, 2);
+    results_zeros    = zeros(results_length, 3);
     offs             = results_zeros;
-
+        
     % Set up the figure with model representation, axis properties, handles for vertical line drawing
     sfigure(1); clf; axis auto;
     
     % Figure with orignal data
     sfigure(4); clf; axis auto;
-    plot(1:size(data, 1), data(:,:));
-    set(gca, 'XTick', 0:50:size(data, 1));
+    plot(data(:,1), data(:,2:end));
+    set(gca, 'XTick', 0:2:data(end, 1));
     
     h_verticals = draw_vertical_lines([0 0]);
 
@@ -75,7 +78,7 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
    
     
     % Create the SVDD
-    W = inc_setup('svdd', ktype, kpar, C, data(1:first_block_size,:), ones(first_block_size, 1) );
+    W = inc_setup('svdd', ktype, kpar, C, data(1:first_block_size,2:end), ones(first_block_size, 1) );
 
     from = 1;
     counter = 1;
@@ -88,10 +91,11 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
     for i = first_block_size + step_size: step_size : size(data, 1)
         % Extract new point from data buffer
         new_points = data(i-step_size + 1 : i, :);
+        time = new_points(end,1);
         
         % Add to SVDD
         for j = 1 : size(new_points, 1)
-            W = inc_add(W, new_points(j,:), 1);
+            W = inc_add(W, new_points(j,2:end), 1);
         end
         
         % Remove first point from SVDD
@@ -102,21 +106,21 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
             end
             from = from + step_size;
         end
-        
+        time_start = data(from-step_size, 1);
         
         % Get mapping representations
         w0 = inc_store(W);
         w = +w0;
 
-        offs(counter,:) = [i, w.offs];
+        offs(counter,:) = [new_points(end,1) i w.offs];
 
         % Draw mapping and points
         [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = calculate_data_and_boundary(data, from:i, w0, w, i-step_size+1:i, counter == 1);
         
-        number_of_outliers(counter,:) = properties('number_of_outliers');
-        offsets(counter,:)            = properties('offsets');
-        outlier_distances(counter,:)  = properties('outlier_distances');
-        thresholds(counter,:)         = properties('thresholds');
+        number_of_outliers(counter,:) = [time properties('number_of_outliers')];
+        offsets(counter,:)            = [time properties('offsets')];
+        outlier_distances(counter,:)  = [time  properties('outlier_distances')];
+        thresholds(counter,:)         = [time properties('thresholds')];
         
         handles = [h_data(1), h_SVs(1), h_new_points(1)];
         texts = {['Data (' int2str(i-from+1+step_size) ') '], ['Support Vectors (' int2str(length(w.sv)) ') '], ['New Point (' int2str(i) ') ']};
@@ -140,8 +144,9 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
         % Draw the selection-bars in the data-plot window
         sfigure(4);
         yL = get(gca, 'YLim');
-        set(h_verticals(1), 'XData', [from-step_size from-step_size], 'YData', yL );
-        set(h_verticals(2), 'XData', [i i], 'YData', yL );
+        
+        set(h_verticals(1), 'XData', [time_start time_start], 'YData', yL );
+        set(h_verticals(2), 'XData', [time time], 'YData', yL );
         drawnow;
 
         counter = counter + 1;
@@ -177,7 +182,7 @@ function [h_data, h_SVs, h_new_points, h_outliers, h_boundary, properties] = cal
     i = indices_new(end);
     
     % Check which (new) data points are outliers
-    new_data = data(rows,:);
+    new_data = data(rows,2:end);
     new_data_mapped = +(new_data * w);
     threshold = W.threshold;
     indices_outliers = abs(new_data_mapped(:,1)) - 0.0001 > (threshold);
