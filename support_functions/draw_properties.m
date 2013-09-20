@@ -62,7 +62,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
             ratio_series(j) = ratio(series(1:j,:), ratio_history_length); 
         end
         
-        ratio_map(char(key)) = [series(:,1) ratio_series'];
+        ratio_map(char(key)) = [series(:,1) series(:,2) ratio_series'];
     end
    
     % figure(1) should hold the mapped data and outlier shape
@@ -85,10 +85,10 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     ratio_offsets    = ratio_map('offsets');
     ratio_thresholds = ratio_map('thresholds');
     
-    plot(data_x, offsets(:,2), 'k-' );
-    addaxis(data_x, thresholds(:,2), 'r-' );
-    addaxis(data_x, ratio_offsets(:,2), 'm--' );
-    addaxis(data_x, ratio_thresholds(:,2), 'b--' );
+    plot(data_x, offsets(:,3), 'k-' );
+    addaxis(data_x, thresholds(:,3), 'r-' );
+    addaxis(data_x, ratio_offsets(:,3), 'm--' );
+    addaxis(data_x, ratio_thresholds(:,3), 'b--' );
     
     addaxislabel(1, 'Offsets');
     addaxislabel(2, 'Thresholds');
@@ -97,7 +97,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     
     legend('Offsets', 'Thresholds', 'Ratio offsets', 'Ratio thresholds');
     
-    set(gca, 'XTick', 0:50:data_x(end, 1));
+    set(gca, 'XTick', 0:2:data_x(end, 1));
     
     % Outlier distances and number
     sfigure(3); clf; axis auto;
@@ -106,10 +106,10 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     ratio_distances = ratio_map('outlier_distances');
     ratio_number    = ratio_map('number_of_outliers');
     
-    plot(data_x, outlier_distances(:,2), 'k-' );
-    addaxis(data_x, number_of_outliers(:,2), 'r-' );
-    addaxis(data_x, ratio_distances(:,2), 'm--' );
-    addaxis(data_x, ratio_number(:,2), 'b--' );
+    plot(data_x, outlier_distances(:,3), 'k-' );
+    addaxis(data_x, number_of_outliers(:,3), 'r-' );
+    addaxis(data_x, ratio_distances(:,3), 'm--' );
+    addaxis(data_x, ratio_number(:,3), 'b--' );
     
     addaxislabel(1, 'Outlier distances');
     addaxislabel(2, 'Number of outliers');
@@ -118,5 +118,5 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     
     legend('Outlier distances', 'Number of outliers', 'Ratio distances', 'Ratio number');    
     
-    set(gca, 'XTick', 0:50:data_x(end, 1));
+    set(gca, 'XTick', 0:2:data_x(end, 1));
 end

@@ -9,16 +9,24 @@
 %
 % Currently, other properties of the line can not be set.
 
-function handles = draw_vertical_lines( positions, color )
+function handles = draw_vertical_lines( positions, color, lineWidth, lineStyle )
 
     if nargin < 2
         color = 'k';
+    end
+    
+    if nargin < 3
+        lineWidth = 1;
+    end
+    
+    if nargin < 4
+        lineStyle = '-';
     end
 
     yL = get(gca, 'YLim');
     handles = zeros(length(positions),1);
     for i = 1 : length(positions)
-        handles(i) = line([positions(i) positions(i)], yL, 'Color', color );
+        handles(i) = line([positions(i) positions(i)], yL, 'Color', color, 'lineWidth', lineWidth, 'lineStyle', lineStyle );
     end
 
 end

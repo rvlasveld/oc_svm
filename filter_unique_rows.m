@@ -37,7 +37,7 @@ function matrices = filter_unique_rows( matrices, key_column )
                 set_i = matrices{i};
                 set_j = matrices{j};
                 
-                removals{i,j} = find(ismember(set_i(:,key_column), set_j(:, key_column)) == 0)
+                removals{i,j} = find(ismember(set_i(:,key_column), set_j(:, key_column)) == 0);
         end
     end
     
