@@ -97,7 +97,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     
     legend('Offsets', 'Thresholds', 'Ratio offsets', 'Ratio thresholds');
     
-    set(gca, 'XTick', 0:2:data_x(end, 1));
+    set(gca, 'XTick', 0:roundn(length(data_x)/50, 1):data_x(end, 1));
     
     % Outlier distances and number
     sfigure(3); clf; axis auto;
@@ -118,5 +118,5 @@ function ratio_map = draw_properties( properties, ratio_history_length )
     
     legend('Outlier distances', 'Number of outliers', 'Ratio distances', 'Ratio number');    
     
-    set(gca, 'XTick', 0:2:data_x(end, 1));
+    set(gca, 'XTick', 0:roundn(length(data_x)/50, 1):data_x(end, 1));
 end

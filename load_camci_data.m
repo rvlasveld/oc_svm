@@ -8,11 +8,12 @@
 %   , the second has change in mean and variance and the last has only a 
 %   change in variance.
 
-function [datapoints, change_points] = load_camci_data( data_length, segment_size, change_type )
+function [datapoints, change_points] = load_camci_data( change_type, data_length, segment_size)
     
-    if nargin < 1; data_length  = 1000; end
-    if nargin < 2; segment_size = 100; end
-    if nargin < 3; change_type  = 1; end
+    if nargin < 1; change_type  = 1; end
+    if nargin < 2; data_length  = 10000; end
+    if nargin < 3; segment_size = 1000; end
+    
     
 
     x = [0; 0];
@@ -37,19 +38,25 @@ function [datapoints, change_points] = load_camci_data( data_length, segment_siz
 end
 
 function [mean, variance] = mean_and_var(i, data_length, segment_size, type, mean, variance)
-    
     if mod(i, segment_size) == 0
         y = i / segment_size;
-        
         switch type
             case 1
-                % Change in mean
+                % Change in mean with fixed difference (Camci)
                 mean = y * 5;
             case 2
-                % Change in mean and variance
+                % Change in mean with relative difference (Takeuchi and
+                % Yamanishi
+                mean = mean + (10 - y);
+            case 3
+                % Change in mean (relatieve) and variance, Camci
                 mean = mean + (10 - y);
                 % Variance below
-            case 3
+            case 4
+                % Change in mean (absolute) and variance, Takeuchi
+                mean = mean + 1;
+                % Variance below
+            case 5
                 % Change in variance
                 if mod(y,2) == 0
                     variance = 1;
@@ -60,7 +67,7 @@ function [mean, variance] = mean_and_var(i, data_length, segment_size, type, mea
         end
     end
     
-    if type == 2
+    if type == 3 || type == 4
         
         % Change in mean and variance. Mean already done in switch block
         variance = 0.1/(0.01 + (data_length - i)/data_length);

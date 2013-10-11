@@ -25,6 +25,7 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
     set(0,'DefaultAxesLooseInset',[0.03,0,0.05,0])
 
     for i = 1 : length(inputs)
+%     for i = 1 : 1
         input = inputs{i};
         for j = 1 : 1 % length(block_lengths)
             % block_length = block_lengths(j);
@@ -34,42 +35,23 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
             
             change_points = [];
             
-            filename = ['data/collections/running-outside-almende/' serie '/matlab_properties_' input '_block_' int2str(block_length) '_step_1_sigma_13.mat'];
+            filename = ['data/collections/running-outside-almende/' serie '/properties_' input '_b_' int2str(block_length) '_t_1_s_8.mat'];
             
             if exist(filename, 'file') == 2
                 loaded = load(filename, 'properties');
                 properties = getfield(loaded, 'properties');
-%                 Variable 'properties' is now loaded
+                % Variable 'properties' is now loaded
                 
                 metric_series = properties(metric);
                 
-                [change_points, ~, ~, handles] = calculate_changepoints(properties, metric, 'threshold', 1.5, 0.8);
+                [change_points, ~, ~, handles] = calculate_changepoints(properties, metric, 'threshold', 1.4, 0.8);
                 h = sfigure(5);
                 % Close the generate windows (by calculate_changepoints)
                 
-                
-                % Calculate offset of used data for properties
-%                 offset = length(data) - length(metric_series);
-%                 time_offset = data(offset, 1);
-%                 time_offset
-                time_offset = 0;
+                times = merge_close(change_points(:,2), closeness);
                 
                 change_points = change_points(:,2) + time_offset;
-%                 times_for_change_points = times(change_points');
-                times_for_change_points = change_points;
-                change_points
                 
-                diff_cp = diff(times_for_change_points);
-                large_enough_indices = find(diff_cp > closeness);
-                
-                
-%                 change_and_time = [change_points(large_enough_indices) times_for_change_points(large_enough_indices)]
-                times = times_for_change_points(large_enough_indices);
-                
-                
-%                 change_points(end,1)
-
-
                 % Draw original signal, calculated CPs and annotated CPs
                 
                 f = sfigure(i + 10); clf; cla; hold on;
@@ -94,24 +76,23 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
                 end
                 
                 axis([0 data(end,1) 0 1]);
-%                 f = 
                 
-%                 plot(data(:,1), data_to_plot(:,2:end), 'linestyle', '-');
-%                 clf;
-%                 f = sfigure(5);
-%                 childs = allchild(gcf)
-%                 sfigure(i+10);
                 f = subplot(212);
                 cla;
-                handles;
+                
                 copyobj(handles, f);
                 axis([0 data(end,1) 0 3]);
+                
+                set(gca, 'XTick', 0:2:data(end,1));
                 
                 top = subplot(211);
                 t = title(top, [input ' block size: ' int2str(block_length)]);
                 set(t,'Interpreter','none');    % ignore underscores in title
                 set(t, 'FontSize', 20);
+                set(gca, 'XTick', 0:2:data(end,1));
                 
+            else
+                disp(['File "' filename '" does not exists']);
             end
             
 %             outputs(metric) = change_and_time;

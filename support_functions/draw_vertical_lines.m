@@ -1,11 +1,12 @@
 %DRAW_VERICAL_LINES Draw a series of vertical lines in the current figure
 %
-%       HANDLES = DRAW_VERTICAL_LINES(POSITIONS, COLOR)
+%       HANDLES = DRAW_VERTICAL_LINES(POSITIONS, COLOR, LINEWIDTH, LINESTYLE)
 %
 % Draw a series of vertical lines in the current (=last used) figure.
 % The values in POSITIONS correspond to the position in the x-axis at which
 % a line will be drawn.
-% A COLOR string can be added for color settings etc.
+% The line style and color can be set with COLOR, LINEWIDTH and LINESTYLE,
+% which correspond with 'color', 'lineWidth', and 'lineStyle'.
 %
 % Currently, other properties of the line can not be set.
 

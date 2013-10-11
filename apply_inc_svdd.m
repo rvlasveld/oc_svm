@@ -67,7 +67,7 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
     % Figure with orignal data
     sfigure(4); clf; axis auto;
     plot(data(:,1), data(:,2:end));
-    set(gca, 'XTick', 0:2:data(end, 1));
+    set(gca, 'XTick', 0:roundn(length(data)/50, 1):data(end, 1));
     
     h_verticals = draw_vertical_lines([0 0]);
 
