@@ -58,7 +58,7 @@ function ratio_map = draw_properties( properties, ratio_history_length )
         series = cell2mat(values(properties,key));
         ratio_series = zeros(1, size(series, 1));
         
-        for j = i : size(series, 1)
+        for j = 1 : size(series, 1)
             ratio_series(j) = ratio(series(1:j,:), ratio_history_length); 
         end
         

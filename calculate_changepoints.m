@@ -54,10 +54,12 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     plot_height = screenSize(4) / 4;
     set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
     
+    ratios
+    
     handle_plot = plot(ratios(:,1), ratios(:,2));
     
     handles_vertical        = draw_vertical_lines(change_points(:,2), 'r');
-    handles_vertical_shadow = draw_vertical_lines(shadow_points(:,2), 'g', 1, '--');
+    handles_vertical_shadow = draw_vertical_lines(shadow_points(:,2), 'r', 1, '--');
     handles_vertical        = horzcat(handles_vertical', handles_vertical_shadow')';
     
     handles_horizontal = draw_horizontal_lines([high low], 'r');
@@ -66,9 +68,9 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     set(gca, 'YTick', 0:0.1:max(ratios(:,2)));
     
     % Add empty axis, to create equal spacing with other plots
-    addaxis([],[]);
-    addaxis([],[]);
-    addaxis([],[]);
+%     addaxis([],[]);
+%     addaxis([],[]);
+%     addaxis([],[]);
     
     % Plot change points in original data figure
     sfigure(4);
@@ -99,11 +101,17 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
     ratios = zeros(size(data_values, 1),2);
     
     for i = 2 : length(data_values)
+        
         time = data_values(i, 1);
         
         series = data_values(change_points(end,1):i,column);
         r = ratio(series);
         ratios(i,:) = [time r];
+        
+        % Skip if last change point was within a certain range
+        if (i - change_points(end, 1)) < 10 
+            continue;
+        end
         
         if r > high
             change_points(end+1,:) = [i time 0];
@@ -121,6 +129,8 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
             % outliers.
         end
     end
+    
+    change_points
 end
 
 

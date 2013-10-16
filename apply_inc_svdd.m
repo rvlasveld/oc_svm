@@ -62,12 +62,12 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
     offs             = results_zeros;
         
     % Set up the figure with model representation, axis properties, handles for vertical line drawing
-    sfigure(1); clf; axis auto;
+%     sfigure(1); clf; axis auto;
     
     % Figure with orignal data
     sfigure(4); clf; axis auto;
     plot(data(:,1), data(:,2:end));
-    set(gca, 'XTick', 0:roundn(length(data)/50, 1):data(end, 1));
+    set(gca, 'XTick', 0:roundn(length(data)/25, 1):data(end, 1));
     
     h_verticals = draw_vertical_lines([0 0]);
 
@@ -161,10 +161,10 @@ function [results, ratios] = apply_inc_svdd( data, columns, block_size, step_siz
     ratios = draw_properties(results, 20 );
     
     % Add empty y cols for equal space
-    sfigure(4);
-    addaxis([],[]);
-    addaxis([],[]);
-    addaxis([],[]);
+%     sfigure(4);
+%     addaxis([],[]);
+%     addaxis([],[]);
+%     addaxis([],[]);
 end
 
 

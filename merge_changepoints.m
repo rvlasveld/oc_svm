@@ -45,7 +45,7 @@ function merged_values = merge_changepoints( values, closeness )
     
     values = sortrows(values, 2);
     
-    diff_cp = diff(values(:,2)) > closeness
+    diff_cp = diff(values(:,2)) > closeness;
     indices = [];
     splits = SplitVec(diff_cp);
     counter = 1;
@@ -63,7 +63,7 @@ function merged_values = merge_changepoints( values, closeness )
                 split = cumsum( (split' .* low_cp_values) );
                 
 %                 split = cumsum(split) + counter;
-                indices = [indices unique(split+counter)]
+                indices = [indices unique(split+counter)];
             end
         else
             % Serie of small distances.
