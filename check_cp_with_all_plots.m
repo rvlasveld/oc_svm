@@ -11,7 +11,7 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
     script_load_acc_data;
     times = data(:,1);
     
-    % Load change points into variable 'cp'
+    % Load annotated change points into variable 'cp'
     load(['data/collections/running-outside-almende/' serie '/change_points.mat']);
     outputs = containers.Map();
     outputs('annotated') = cp;
