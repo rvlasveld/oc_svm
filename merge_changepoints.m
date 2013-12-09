@@ -45,7 +45,7 @@ function merged_values = merge_changepoints( values, closeness )
     column = 1;
     if size(values, 2) > 1; column = 2; end
     
-    disp(['Merging with closeness: ' num2str(closeness)]);
+    disp(['Merging with closeness: ' num2str(closeness) ' on column ' num2str(column)]);
     column
     values = sortrows(values, column)
     

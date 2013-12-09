@@ -112,9 +112,9 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
         ratios(i,:) = [time r];
         
         % Skip if last change point was within a certain range
-        if (i - change_points(end, 1)) < 10 
-            continue;
-        end
+%         if (i - change_points(end, 1)) < 10 
+%             continue;
+%         end
         
         if r > high
             disp(['High treshold at i: ' num2str(i) ', time: ' num2str(time) ', value r:' num2str(r) ])
@@ -125,8 +125,9 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
         
         if r < low
             disp(['Low treshold at i: ' num2str(i) ', time: ' num2str(time) ', value r:' num2str(r) ])
-            disp(['Corrected to time ' num2str(time-block_size+outlier_fraction*block_size) ])
-            change_points(end+1,:) = [i time-block_size+outlier_fraction*block_size 1];
+%             disp(['Corrected to time ' num2str(time-block_size+outlier_fraction*block_size) ])
+%             change_points(end+1,:) = [i time-block_size+outlier_fraction*block_size 1];
+            change_points(end+1,:) = [i time 1];
             shadow_points(end+1,:) = [i time 1];
             
             % NOTE: compensate for block size
