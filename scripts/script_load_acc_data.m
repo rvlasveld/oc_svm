@@ -15,13 +15,18 @@ if ~exist('serie', 'var')
     serie = 'run-1-walk-run-roemer';
 end
 
-disp(['Going to read ' serie]);
+% disp(['Going to read ' serie]);
 
-accelerometer = csvread(['data/collections/running-outside-almende/' serie '/accelerometer.csv']);
-% lin_acceleration = csvread('data/collections/running-outside-almende/run-1-walk-run-roemer/20130828_114820/lin_acceleration.csv');
-magnetic = csvread(['data/collections/running-outside-almende/' serie '/magnetic_field.csv']);
-rotation = csvread(['data/collections/running-outside-almende/' serie '/rotation.csv']);
-% gravity = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-2/gravity.csv');
+% accelerometer = csvread(['data/collections/running-outside-almende/' serie '/accelerometer.csv']);
+% % lin_acceleration = csvread('data/collections/running-outside-almende/run-1-walk-run-roemer/20130828_114820/lin_acceleration.csv');
+% magnetic = csvread(['data/collections/running-outside-almende/' serie '/magnetic_field.csv']);
+% rotation = csvread(['data/collections/running-outside-almende/' serie '/rotation.csv']);
+% % gravity = csvread('data/collections/downstairs-downstairs-upstairs-upstairs-almende/juan-2/gravity.csv');
+
+accelerometer = csvread(['data/collections/stairs-indoor/marc-1/accelerometer.csv']);
+magnetic = csvread(['data/collections/stairs-indoor/marc-1/magnetic_field.csv']);
+rotation = csvread(['data/collections/stairs-indoor/marc-1/rotation.csv']);
+
 
 % accelerometer = gravity;
 

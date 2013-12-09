@@ -5,7 +5,7 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
 
     if nargin < 1; serie  = 'run-1-walk-run-roemer'; end;
     if nargin < 2; metric = 'thresholds'; end;
-    if nargin < 3; closeness = 0.5; end;
+    if nargin < 3; closeness = 1; end;
     
     % Load raw data
     script_load_acc_data;
@@ -17,7 +17,9 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
     outputs('annotated') = cp;
     
     inputs = {'acc'; 'acc_mag'; 'acc_mag_rot'; 'mag'; 'mag_rot'; 'rot'; 'acc_rot'};
+%     inputs = {'acc_mag'};
     input_indices = {1:4; 1:7; 1:10; [1 5:7]; [1 5:10]; [1 8:10]; [1:4 8:10]};
+%     input_indices = {1:7};
 %     lengths = [50 80];
 %     block_lengths = [50];
 
@@ -44,13 +46,13 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
                 
                 metric_series = properties(metric);
                 
-                [change_points, ~, ~, handles] = calculate_changepoints(properties, metric, 'threshold', 1.4, 0.8);
+                [change_points, ~, ~, handles] = calculate_changepoints(properties, metric, 'threshold', closeness, 0.1, 1.3, 0.8);
                 h = sfigure(5);
                 % Close the generate windows (by calculate_changepoints)
                 
-                times = merge_close(change_points(:,2), closeness);
+%                 times = merge_close(change_points(:,2), closeness);
                 
-                change_points = change_points(:,2) + time_offset;
+%                 change_points = change_points(:,2) + time_offset;
                 
                 % Draw original signal, calculated CPs and annotated CPs
                 
@@ -70,9 +72,9 @@ function outputs = check_cp_with_all_plots( serie, metric, closeness )
                 plot(data(:,1), data_to_plot(:,2:end), 'linestyle', '-');
                 draw_vertical_lines(cp, 'k', 2, '--');
                 
-                if length(times) > 0
+                if length(change_points) > 0
 %                     draw_vertical_lines(change_and_time(:,2), 'm', 2, '--');
-                    draw_vertical_lines(times, 'm', 2, '--');
+                    draw_vertical_lines(change_points, 'm', 2, '--');
                 end
                 
                 axis([0 data(end,1) 0 1]);

@@ -28,9 +28,9 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
                 disp(['- For a single field ' fields{1}]);
                 [change_points, ratios, shadow_points] = thresholding_single(properties, fields, high, low, outlier_fraction);
                 
-            else
-                disp(['- For multiple fields ' cell2mat(fields) ]);
-                [change_points, ratios, shadow_points] = thresholding_multiple(properties, fields, high, low, outlier_fraction);
+%             else
+%                 disp(['- For multiple fields ' cell2mat(fields) ]);
+%                 [change_points, ratios, shadow_points] = thresholding_multiple(properties, fields, high, low, outlier_fraction);
             end
             
         otherwise
@@ -41,10 +41,12 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     end
     
     % Merge change points
+    change_points
     change_points_merged = merge_changepoints(change_points, closeness);
 %     change_points_merged = change_points(:,2);
             
-
+    ratios;
+    
     % Plot ratios and changepoint in new figure
     sfigure(5); clf;
     
@@ -54,13 +56,11 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     plot_height = screenSize(4) / 4;
     set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
     
-    ratios
-    
     handle_plot = plot(ratios(:,1), ratios(:,2));
     
-    handles_vertical        = draw_vertical_lines(change_points(:,2), 'r');
-    handles_vertical_shadow = draw_vertical_lines(shadow_points(:,2), 'r', 1, '--');
-    handles_vertical        = horzcat(handles_vertical', handles_vertical_shadow')';
+    handles_vertical        = draw_vertical_lines(change_points_merged, 'r');
+%     handles_vertical_shadow = draw_vertical_lines(shadow_points(:,2), 'r', 1, '--');
+%     handles_vertical        = horzcat(handles_vertical', handles_vertical_shadow')';
     
     handles_horizontal = draw_horizontal_lines([high low], 'r');
     
@@ -94,11 +94,14 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
     if nargin < 4; low = 0.2; end
     
     % Determine block sizes
-    block_size = data_values(1,1) - data_values(3,1) + data_values(2,1);
+    block_size = data_values(1,1) - data_values(3,1) + data_values(2,1) - 1;
     
     change_points = [1 1 0]; %zeros(size(data_values),2);
     shadow_points = [1 1 0];
     ratios = zeros(size(data_values, 1),2);
+    
+    block_size
+    outlier_fraction
     
     for i = 2 : length(data_values)
         
@@ -114,12 +117,15 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
         end
         
         if r > high
+            disp(['High treshold at i: ' num2str(i) ', time: ' num2str(time) ', value r:' num2str(r) ])
             change_points(end+1,:) = [i time 0];
         end
         
         % TODO: check block-compenstation for low values
         
         if r < low
+            disp(['Low treshold at i: ' num2str(i) ', time: ' num2str(time) ', value r:' num2str(r) ])
+            disp(['Corrected to time ' num2str(time-block_size+outlier_fraction*block_size) ])
             change_points(end+1,:) = [i time-block_size+outlier_fraction*block_size 1];
             shadow_points(end+1,:) = [i time 1];
             
@@ -129,56 +135,10 @@ function [change_points, ratios, shadow_points] = thresholding_single(properties
             % outliers.
         end
     end
+    change_points = sortrows(change_points, 2);
     
-    change_points
+    [C, ai, ci] = unique(change_points(:,2), 'stable');
+    change_points = change_points(ai,:);
+    
+    change_points;
 end
-
-
-
-% function [change_points, ratios] = thresholding_multiple(properties, fields, high, low)
-%     % Use the thresholding method. Sum all the ratios of the data series
-%     % indicated by the fields.
-%     
-%     column = 2;     % Assume first column is time/index, second has value
-%     
-%     data_values = containers.Map();
-%     
-%     for i = 1 : length(fields)
-%         field = fields{i};
-%         field_values = cell2mat(values(properties, field));
-%         
-%         % Normalize the column with the values
-%         field_values(:,column) = mat2gray(field_values(:,column));
-%         
-%         data_values(field) = field_values;
-%     end
-%     
-%     if nargin < 3; high = 3;  end
-%     if nargin < 4; low = 0.2; end
-%     
-%     % Determine block sizes
-%     block_size = data_values(1,1) - data_values(3,1) + data_values(2,1);
-%     
-%     change_points = [1 1]; %zeros(size(data_values),2);
-%     ratios = zeros(size(data_values, 1),2);
-%     
-%     for i = 2 : length(data_values)
-%         time = data_values(i, 1);
-%         
-%         series = data_values(change_points(end,1):i,column);
-%         r = ratio(series, 10);
-%         ratios(i,:) = [time r];
-%         
-% %         if r > high
-% %             change_points(end+1,:) = [i time];
-% %         end
-%         
-%         % TODO: check block-compenstation for low values
-%         
-% %         if r < low
-% %             change_points(end+1,:) = [i time-block_size];
-% %         end;
-%         
-%     end
-% 
-% end

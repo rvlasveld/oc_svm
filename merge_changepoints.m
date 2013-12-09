@@ -42,47 +42,109 @@ function merged_values = merge_changepoints( values, closeness )
     % be used.
 
     if nargin < 2; closeness = 5; end
+    column = 1;
+    if size(values, 2) > 1; column = 2; end
     
-    values = sortrows(values, 2);
+    disp(['Merging with closeness: ' num2str(closeness)]);
+    column
+    values = sortrows(values, column)
     
-    diff_cp = diff(values(:,2)) > closeness;
-    indices = [];
-    splits = SplitVec(diff_cp);
-    counter = 1;
-    for k = 1:length(splits)
-        split = splits{k};
-        values(counter:counter+length(split)-1, 2)
-        if split(1) == 1 
-            % Serie of large enough distances
-            
-            if length(split) > 1
-                
-                % Only use values for high-passing change points
-                sum = cumsum(split);
-                low_cp_values = (values(sum + counter, 3) < 1)';
-                split = cumsum( (split' .* low_cp_values) );
-                
-%                 split = cumsum(split) + counter;
-                indices = [indices unique(split+counter)];
-            end
-        else
-            % Serie of small distances.
-            
-            % Determine whether to use first or last, depending on type
-            if values(counter, 3) == 0
-                % high-passing type, use first
-                use_changepoint = counter;
-            else
-                % low-passing type, use last
-                use_changepoint = counter + length(split);
-            end
-            indices = [indices use_changepoint];
-        end
-        counter = counter + length(split);
-    end
+    sfigure(4);
+    draw_vertical_lines(values(:,column), 'g');
+    
+    % Copy last value to make sure it is considered as a change point
+    values(end+1,:) = values(end,:);
+    
+    diffs = diff(values(:,column))
+    diff_cp = diffs <= closeness
+    
+    [values(1:end-1,column) diffs diff_cp]
+    
+    
+    too_close_indices = find(diff_cp == 1) + 1
+    
 
-    merged_values = values(indices, 2);
+    values(too_close_indices, :) = 0
+    
+    
+    
+    
+    
+%     diff_composed = [diff_cp values(1:end-1,3)]
+    
+%     indices = [];
+%     splits = SplitVec(diff_cp)
+%     counter = 1;
+%     
+%     for k = 1:length(splits)
+%         k
+%         counter
+%         split = splits{k}
+%         
+% %         split_indices = cumsum(split)' + counter-1;
+%         split_indices = cumsum(ones(size(split,1),1))' + counter-1;
+%         split_indices
+%         
+%         disp('Values of this split:')
+%         values(split_indices, :)
+%         
+%         if length(split) > 0
+% 
+%             if split(1) == 1 
+%                 % Serie of large enough distances
+%                 disp('Long series');
+%                 if length(split) > 1
+%                     disp('Length > 1, high passing change points');
+% 
+%                     % Only use values for high-passing change points
+% 
+%     %                 sum = cumsum(split)
+%     %                 values(split_indices, :)
+%     %                 low_cp_values = (values(sum + counter-1, 3) < 1)'
+% 
+%     %                 split = cumsum( (split' .* low_cp_values) )
+% 
+%     %                 split = cumsum(split) + counter;
+%     %                 indices = unique([indices (split+counter)])
+%                     indices = unique([indices split_indices]);
+%     %                 values(indices,:)
+%                 end
+%             else
+%                 % Serie of small distances.
+%                 disp('Small distances');
+% 
+%                 % Determine whether to use first or last, depending on type
+%                 if sum(values(split_indices, 3)) == 0
+%                     % high-passing type, use first
+%                     disp('Use first')
+%                     use_changepoint = counter;
+% 
+%                     % Remove first changepoint of new segment
+%                     if k < length(splits)
+%                         split_next = splits{k+1}
+%                         if split_next(1) == 1 
+%                             % Next split has large value of next
+%                             split_next = split_next(2:end)
+%                             splits{k+1} = split_next
+%                         end
+%                     end
+%                 else
+%                     % low-passing type, use last
+%                     disp('Use last')
+%                     use_changepoint = counter + length(split);
+%                 end
+%                 indices
+%                 use_changepoint
+%                 indices = [indices use_changepoint];
+%             end
+%             counter = counter + size(split, 1);
+%         else
+%             counter = counter + 1;
+%         end
+%         indices
+%     end
 
+    merged_values = values(find(values(:,column) > 0 ),column)
 
 end
 

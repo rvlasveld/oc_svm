@@ -85,8 +85,18 @@ end
 
 range = 1:length(data_for_subject);
 
+size(range)
+size(data_for_subject)
+
+range = 1:length(data_for_subject)/2;
+size(range)
+data_for_subject = data_for_subject(range,:);
+
 figure(5);
 clf;
+
+size(range)
+size(data_for_subject)
 
 [ax, h1, h2] = plotyy(range, data_for_subject, range, activity_for_subject(range) );
 set(ax(1), 'YLim', [floor(min(min(data(range,:))) * 100)/100 ceil(max(max(data(range,:))) * 100)/100]);

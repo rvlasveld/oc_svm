@@ -18,8 +18,9 @@ function [ ratios ] = draw_single_property( property, draw_ratio, ratio_history_
     end
     
     
-    clf; axis auto;
-    set(0,'DefaultAxesLooseInset',[0.02,0,0.02,0])
+    clf; 
+%     axis auto;
+%     set(0,'DefaultAxesLooseInset',[0.02,0,0.02,0])
     
     % Set plot location and size
 %     screenSize = get(0,'ScreenSize');
@@ -28,9 +29,10 @@ function [ ratios ] = draw_single_property( property, draw_ratio, ratio_history_
     
 %     set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
     
-    plot(data_x, property(:,3), 'b-');
-    legend('Property');
-    axis([0 data_x(end,1) 0 max(property(:,3))])
+%     plot(data_x, property(:,3), 'b-');
+    semilogy(data_x, property(:,3), 'b-');
+%     legend('Property');
+%     axis([0 data_x(end,1) 0 max(property(:,3))])
     
     if draw_ratio
         hold on;
@@ -41,7 +43,7 @@ function [ ratios ] = draw_single_property( property, draw_ratio, ratio_history_
     
     
     
-    set(gca, 'XTick', 0:roundn(length(data_x)/25, 1):data_x(end, 1));
+%     set(gca, 'XTick', 0:roundn(length(data_x)/25, 1):data_x(end, 1));
 
 end
 

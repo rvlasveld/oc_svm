@@ -46,7 +46,7 @@ function [mean, variance] = mean_and_var(i, data_length, segment_size, type, mea
                 mean = y * 5;
             case 2
                 % Change in mean with relative difference (Takeuchi and
-                % Yamanishi
+                % Yamanishi, first set
                 mean = mean + (10 - y);
             case 3
                 % Change in mean (relatieve) and variance, Camci
