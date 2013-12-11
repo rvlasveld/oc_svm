@@ -1,4 +1,4 @@
-function [ values ] = closest_two_array( original, discovered )
+function [ values, s ] = closest_two_array( original, discovered )
 % CLOSEST_TWO_ARRAY Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,5 +10,6 @@ function [ values ] = closest_two_array( original, discovered )
         [dist, index] = min(distances);
         values(i,:) = [discovered(index) dist];
     end
+    s = sum(values(:,2))
 end
 

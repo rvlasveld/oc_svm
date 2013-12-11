@@ -61,7 +61,8 @@ function [mean, variance] = mean_and_var(i, data_length, segment_size, type, mea
                 if mod(y,2) == 0
                     variance = 1;
                 else
-                    variance = 9;
+                    % variance = 9;
+                    variance = 8.5;
                 end
                 
         end
