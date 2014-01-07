@@ -51,10 +51,10 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     sfigure(5); clf;
     
     % Set plot width and height
-    screenSize = get(0,'ScreenSize');
-    plot_width  = screenSize(3);
-    plot_height = screenSize(4) / 4;
-    set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
+%     screenSize = get(0,'ScreenSize');
+%     plot_width  = screenSize(3);
+%     plot_height = screenSize(4) / 4;
+%     set(gcf,'Position',[0 (plot_height * 1.3) plot_width plot_height]);
     
     handle_plot = plot(ratios(:,1), ratios(:,2));
     
@@ -64,8 +64,10 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     
     handles_horizontal = draw_horizontal_lines([high low], 'r');
     
-    set(gca, 'XTick', 0:roundn(length(ratios(:,1))/50, 1):ratios(end,1));
-    set(gca, 'YTick', 0:0.1:max(ratios(:,2)));
+    %     set(gca, 'XTick', 0:roundn(length(ratios(:,1))/50, 1):ratios(end,1));
+    set(gca, 'XTick', 0:2:ratios(end,1));
+    set(gca, 'YTick', 0:0.2:max(ratios(:,2)));
+    xlim([0 ratios(end,1)]);
     
     % Add empty axis, to create equal spacing with other plots
 %     addaxis([],[]);
@@ -74,11 +76,12 @@ function [change_points, ratios, handles, handles_fig_5] = calculate_changepoint
     
     % Plot change points in original data figure
     sfigure(4);
-    handles = draw_vertical_lines(change_points_merged, 'm');
+    handles = draw_vertical_lines(change_points_merged, 'b');
     
     handles_fig_5 = horzcat(handle_plot, handles_vertical', handles_horizontal');
-    
+    xlim([0 ratios(end,1)]);
     change_points = change_points_merged;
+    set(gca, 'XTick', 0:2:ratios(end,1));
 end
 
 

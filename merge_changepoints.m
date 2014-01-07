@@ -49,7 +49,7 @@ function merged_values = merge_changepoints( values, closeness )
     column
     values = sortrows(values, column)
     
-    sfigure(4);
+    sfigure(4); clf;
     draw_vertical_lines(values(:,column), 'g');
     
     % Copy last value to make sure it is considered as a change point
