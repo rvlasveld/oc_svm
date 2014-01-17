@@ -1,0 +1,17 @@
+Run 6 - Roemer
+
+      0    'Still'
+ 6.9000    'Shake'
+ 7.7000    'Still'
+ 8.8000    'In pocket'
+11.0000    'Walk'
+14.0000    'Run'
+18.7000    'Walk'
+24.1000    'Circle CW - Walk'
+29.0000    'Walk'
+31.8000    'Run'
+36.0000    'Walk'
+38.0000    'Stand'
+40.3000    'Walk'
+47.8000    'Out pocket'
+48.8000    'Still'

@@ -1,0 +1,14 @@
+Run 5 - Jos
+
+0          'Still'
+3.0000     'Shake'
+4.2000     'Still'
+6.2000     'In pocket'
+7.4000     'Walk'
+12.6000    'Run'
+16.1000    'Turn CW - Run'
+17.4000    'Run'
+20.3000    'Turn CW - Run'
+25.5000    'Turn CW - Run'
+31.0000    'Out pocket'
+32.7000    'Still'

@@ -1,0 +1,14 @@
+Run 4 - Roemer
+
+0          'Still'
+5.4000     'Shake'
+6.2500     'Still'
+7.4000     'In pocket'
+9.5000     'Run'
+12.7000    'Turn CW - Run'
+16.4000    'Turn CW - Run'
+21.5000    'Turn CW - Run'
+24.0000    'Walk'
+30.0000    'Still'
+30.7000    'Out pocket'
+32.0000    'Still'

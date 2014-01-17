@@ -10,6 +10,6 @@ function [ values, s ] = closest_two_array( original, discovered )
         [dist, index] = min(distances);
         values(i,:) = [current_value discovered(index) dist];
     end
-    s = sum(values(:,3))
+    s = sum(values(:,3));
 end
 

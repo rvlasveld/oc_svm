@@ -1,0 +1,8 @@
+Run 3 - Roemer
+
+0          'Walk - in hand'
+3.1000     'In pocket'
+4.7000     'Walk'
+20.5000    'Turn CCW - Walk'
+36.0000    'Out pocket'
+37.5000    'Walk - in hand'

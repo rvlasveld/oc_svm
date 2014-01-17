@@ -1,0 +1,18 @@
+Run 8 - Marc
+
+
+      0    'Table'
+ 5.3000    'In pocket (sitting)'
+ 9.8000    'Walk'
+13.1000    'Downstairs'
+22.6000    'Walk'
+24.3000    'Downstairs'
+33.6000    'Walk'
+37.6000    'Turn CCW - Walk'
+42.4000    'Upstairs'
+51.6000    'Walk'
+54.0000    'Upstairs'
+65.6000    'Walk'
+69.1000    'Stand'
+71.0000    'Out pocket'
+73.0000    'Sit'
